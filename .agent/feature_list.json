@@ -1,0 +1,505 @@
+{
+  "project": "校园安全管理系统 (Campus Safety Management System)",
+  "tech_stack": {
+    "backend": "Spring Boot 3 + MyBatis-Plus + MySQL + Redis + JWT + Spring Security",
+    "frontend": "Vue 3 + Vite + Element Plus + Pinia + Vue Router + ECharts + Axios"
+  },
+  "last_updated": "2026-04-13",
+  "features": [
+    {
+      "id": "F001",
+      "module": "backend-foundation",
+      "category": "infrastructure",
+      "description": "后端基础架构已搭建完成 (BaseEntity, R, PageResult, Security, Config等)",
+      "passes": true,
+      "priority": 0
+    },
+    {
+      "id": "F002",
+      "module": "database",
+      "category": "infrastructure",
+      "description": "数据库初始化SQL脚本已创建 (所有表结构 + 初始数据)",
+      "passes": true,
+      "priority": 0
+    },
+    {
+      "id": "F003",
+      "module": "backend-system",
+      "category": "infrastructure",
+      "description": "系统管理模块后端 (用户/角色/菜单/日志 CRUD) 已完成",
+      "passes": true,
+      "priority": 0
+    },
+    {
+      "id": "F004",
+      "module": "backend-business",
+      "category": "infrastructure",
+      "description": "业务模块后端 (访客/资产/设备/预警/报表 CRUD) 已完成",
+      "passes": true,
+      "priority": 0
+    },
+
+    {
+      "id": "F010",
+      "module": "frontend-scaffold",
+      "category": "frontend",
+      "description": "前端项目初始化: Vite + Vue 3 + package.json + vite.config.ts + tsconfig + main.ts + App.vue",
+      "passes": false,
+      "priority": 1
+    },
+    {
+      "id": "F011",
+      "module": "frontend-scaffold",
+      "category": "frontend",
+      "description": "安装配置Element Plus (全量引入 + 中文语言包 + 图标注册)",
+      "passes": false,
+      "priority": 1
+    },
+    {
+      "id": "F012",
+      "module": "frontend-scaffold",
+      "category": "frontend",
+      "description": "Axios请求封装: baseURL配置, JWT token拦截器, 401自动跳登录, 错误提示",
+      "passes": false,
+      "priority": 1
+    },
+    {
+      "id": "F013",
+      "module": "frontend-scaffold",
+      "category": "frontend",
+      "description": "Vue Router路由配置: 静态路由(登录/404) + 动态路由加载框架",
+      "passes": false,
+      "priority": 1
+    },
+    {
+      "id": "F014",
+      "module": "frontend-scaffold",
+      "category": "frontend",
+      "description": "Pinia状态管理: user store (token/userInfo/permissions) + permission store (动态路由)",
+      "passes": false,
+      "priority": 1
+    },
+    {
+      "id": "F015",
+      "module": "frontend-scaffold",
+      "category": "frontend",
+      "description": "全局样式: CSS变量定义, reset样式, Element Plus主题覆盖, 响应式断点",
+      "passes": false,
+      "priority": 1
+    },
+    {
+      "id": "F016",
+      "module": "frontend-scaffold",
+      "category": "frontend",
+      "description": "权限指令 v-permission: 按钮级权限控制自定义指令",
+      "passes": false,
+      "priority": 2
+    },
+
+    {
+      "id": "F020",
+      "module": "frontend-login",
+      "category": "frontend",
+      "description": "登录页面: 用户名/密码表单, 表单验证, 登录API调用, token存储, 跳转首页",
+      "passes": false,
+      "priority": 1
+    },
+    {
+      "id": "F021",
+      "module": "frontend-login",
+      "category": "frontend",
+      "description": "登录页面: 记住密码功能 (localStorage), 校园主题视觉设计",
+      "passes": false,
+      "priority": 3
+    },
+    {
+      "id": "F022",
+      "module": "frontend-login",
+      "category": "frontend",
+      "description": "路由守卫: 未登录跳登录页, 已登录获取用户信息, 动态路由注入",
+      "passes": false,
+      "priority": 1
+    },
+
+    {
+      "id": "F030",
+      "module": "frontend-layout",
+      "category": "frontend",
+      "description": "主布局组件: 左侧边栏 + 顶部头部 + 主内容区 + 面包屑",
+      "passes": false,
+      "priority": 1
+    },
+    {
+      "id": "F031",
+      "module": "frontend-layout",
+      "category": "frontend",
+      "description": "侧边栏: 根据用户菜单权限动态渲染, 支持折叠/展开, 图标显示, 多级菜单",
+      "passes": false,
+      "priority": 1
+    },
+    {
+      "id": "F032",
+      "module": "frontend-layout",
+      "category": "frontend",
+      "description": "头部组件: 折叠按钮, 面包屑导航, 用户头像下拉菜单(修改密码/退出登录)",
+      "passes": false,
+      "priority": 1
+    },
+    {
+      "id": "F033",
+      "module": "frontend-layout",
+      "category": "frontend",
+      "description": "标签页导航: 多标签页切换, 右键菜单(关闭当前/关闭其他/关闭全部)",
+      "passes": false,
+      "priority": 3
+    },
+
+    {
+      "id": "F040",
+      "module": "frontend-dashboard",
+      "category": "frontend",
+      "description": "仪表盘: 统计卡片(用户数/设备数/预警数/访客数), 调用后端Dashboard API",
+      "passes": false,
+      "priority": 2
+    },
+    {
+      "id": "F041",
+      "module": "frontend-dashboard",
+      "category": "frontend",
+      "description": "仪表盘: 预警趋势折线图 (ECharts, 最近7天/30天)",
+      "passes": false,
+      "priority": 2
+    },
+    {
+      "id": "F042",
+      "module": "frontend-dashboard",
+      "category": "frontend",
+      "description": "仪表盘: 设备类型分布饼图 (ECharts)",
+      "passes": false,
+      "priority": 2
+    },
+    {
+      "id": "F043",
+      "module": "frontend-dashboard",
+      "category": "frontend",
+      "description": "仪表盘: 最近预警记录列表 (最新5条)",
+      "passes": false,
+      "priority": 2
+    },
+    {
+      "id": "F044",
+      "module": "frontend-dashboard",
+      "category": "frontend",
+      "description": "仪表盘: 访客统计柱状图 (本月每日访客量)",
+      "passes": false,
+      "priority": 3
+    },
+
+    {
+      "id": "F050",
+      "module": "frontend-system-user",
+      "category": "frontend",
+      "description": "用户管理页面: 用户列表(分页/搜索/状态筛选), 调用 /api/system/user/page",
+      "passes": false,
+      "priority": 2
+    },
+    {
+      "id": "F051",
+      "module": "frontend-system-user",
+      "category": "frontend",
+      "description": "用户管理: 新增用户对话框(用户名/密码/昵称/手机/邮箱/类型), 表单验证",
+      "passes": false,
+      "priority": 2
+    },
+    {
+      "id": "F052",
+      "module": "frontend-system-user",
+      "category": "frontend",
+      "description": "用户管理: 编辑用户, 重置密码, 启用/禁用, 删除(确认框)",
+      "passes": false,
+      "priority": 2
+    },
+    {
+      "id": "F053",
+      "module": "frontend-system-user",
+      "category": "frontend",
+      "description": "用户管理: 分配角色功能 (选择角色对话框)",
+      "passes": false,
+      "priority": 2
+    },
+
+    {
+      "id": "F060",
+      "module": "frontend-system-role",
+      "category": "frontend",
+      "description": "角色管理页面: 角色列表(分页/搜索), 新增/编辑/删除角色",
+      "passes": false,
+      "priority": 2
+    },
+    {
+      "id": "F061",
+      "module": "frontend-system-role",
+      "category": "frontend",
+      "description": "角色管理: 分配菜单权限 (Tree组件选择菜单)",
+      "passes": false,
+      "priority": 2
+    },
+
+    {
+      "id": "F070",
+      "module": "frontend-system-menu",
+      "category": "frontend",
+      "description": "菜单管理页面: 树形表格展示, 新增/编辑/删除菜单, 菜单类型(目录/菜单/按钮)",
+      "passes": false,
+      "priority": 2
+    },
+
+    {
+      "id": "F080",
+      "module": "frontend-system-log",
+      "category": "frontend",
+      "description": "操作日志页面: 日志列表(分页/时间范围筛选/操作人筛选), 详情查看",
+      "passes": false,
+      "priority": 3
+    },
+
+    {
+      "id": "F090",
+      "module": "frontend-visitor",
+      "category": "frontend",
+      "description": "访客记录页面: 访客列表(分页/姓名搜索/状态筛选/时间范围)",
+      "passes": false,
+      "priority": 2
+    },
+    {
+      "id": "F091",
+      "module": "frontend-visitor",
+      "category": "frontend",
+      "description": "访客记录: 登记访客对话框(姓名/手机/身份证/来访事由/被访人/预计离开时间)",
+      "passes": false,
+      "priority": 2
+    },
+    {
+      "id": "F092",
+      "module": "frontend-visitor",
+      "category": "frontend",
+      "description": "访客审核: 待审核列表, 通过/驳回操作, 审核意见填写",
+      "passes": false,
+      "priority": 2
+    },
+    {
+      "id": "F093",
+      "module": "frontend-visitor",
+      "category": "frontend",
+      "description": "访客管理: 签离操作(记录实际离开时间), 导出功能",
+      "passes": false,
+      "priority": 3
+    },
+
+    {
+      "id": "F100",
+      "module": "frontend-asset",
+      "category": "frontend",
+      "description": "资产管理页面: 资产列表(分页/名称搜索/类型筛选/位置筛选)",
+      "passes": false,
+      "priority": 2
+    },
+    {
+      "id": "F101",
+      "module": "frontend-asset",
+      "category": "frontend",
+      "description": "资产管理: 新增/编辑资产(名称/类型/位置/负责人/状态/备注)",
+      "passes": false,
+      "priority": 2
+    },
+    {
+      "id": "F102",
+      "module": "frontend-asset",
+      "category": "frontend",
+      "description": "资产管理: 删除资产, 资产详情查看",
+      "passes": false,
+      "priority": 2
+    },
+
+    {
+      "id": "F110",
+      "module": "frontend-device",
+      "category": "frontend",
+      "description": "设备管理页面: 设备列表(分页/名称搜索/类型筛选/状态筛选)",
+      "passes": false,
+      "priority": 2
+    },
+    {
+      "id": "F111",
+      "module": "frontend-device",
+      "category": "frontend",
+      "description": "设备管理: 新增/编辑设备(名称/类型/编号/位置/IP地址/状态)",
+      "passes": false,
+      "priority": 2
+    },
+    {
+      "id": "F112",
+      "module": "frontend-device",
+      "category": "frontend",
+      "description": "设备管理: 删除设备, 设备状态标签(在线/离线/故障)颜色区分",
+      "passes": false,
+      "priority": 2
+    },
+
+    {
+      "id": "F120",
+      "module": "frontend-warning",
+      "category": "frontend",
+      "description": "预警记录页面: 预警列表(分页/类型筛选/级别筛选/状态筛选/时间范围)",
+      "passes": false,
+      "priority": 2
+    },
+    {
+      "id": "F121",
+      "module": "frontend-warning",
+      "category": "frontend",
+      "description": "预警记录: 处理预警(填写处理结果/处理人), 查看预警详情",
+      "passes": false,
+      "priority": 2
+    },
+    {
+      "id": "F122",
+      "module": "frontend-warning",
+      "category": "frontend",
+      "description": "预警规则页面: 规则列表, 新增/编辑/删除/启用/禁用规则",
+      "passes": false,
+      "priority": 2
+    },
+    {
+      "id": "F123",
+      "module": "frontend-warning",
+      "category": "frontend",
+      "description": "预警级别用颜色区分: 红色(紧急)/橙色(严重)/黄色(一般)/蓝色(提示)",
+      "passes": false,
+      "priority": 3
+    },
+
+    {
+      "id": "F130",
+      "module": "frontend-report",
+      "category": "frontend",
+      "description": "统计报表页面: 设备统计(类型分布/状态统计), 调用后端报表API",
+      "passes": false,
+      "priority": 3
+    },
+    {
+      "id": "F131",
+      "module": "frontend-report",
+      "category": "frontend",
+      "description": "统计报表: 预警统计(趋势图/类型占比/级别分布), ECharts可视化",
+      "passes": false,
+      "priority": 3
+    },
+    {
+      "id": "F132",
+      "module": "frontend-report",
+      "category": "frontend",
+      "description": "统计报表: 访客统计(日/周/月访客量, 来访事由分析)",
+      "passes": false,
+      "priority": 3
+    },
+    {
+      "id": "F133",
+      "module": "frontend-report",
+      "category": "frontend",
+      "description": "统计报表: 资产统计(类型分布/区域分布)",
+      "passes": false,
+      "priority": 3
+    },
+
+    {
+      "id": "F140",
+      "module": "frontend-common",
+      "category": "frontend",
+      "description": "通用分页组件封装: 支持pageNum/pageSize/total, 页码切换回调",
+      "passes": false,
+      "priority": 2
+    },
+    {
+      "id": "F141",
+      "module": "frontend-common",
+      "category": "frontend",
+      "description": "通用搜索表单组件: 支持展开/收起, 重置按钮",
+      "passes": false,
+      "priority": 3
+    },
+    {
+      "id": "F142",
+      "module": "frontend-common",
+      "category": "frontend",
+      "description": "404页面 + 无权限403页面",
+      "passes": false,
+      "priority": 3
+    },
+
+    {
+      "id": "F150",
+      "module": "integration",
+      "category": "integration",
+      "description": "前后端联调: 登录流程 (登录->获取token->获取用户信息->获取菜单->渲染)",
+      "passes": false,
+      "priority": 1
+    },
+    {
+      "id": "F151",
+      "module": "integration",
+      "category": "integration",
+      "description": "前后端联调: CRUD操作联调 (列表/新增/编辑/删除 完整流程)",
+      "passes": false,
+      "priority": 2
+    },
+    {
+      "id": "F152",
+      "module": "integration",
+      "category": "integration",
+      "description": "Vite代理配置: /api -> http://localhost:8080 反向代理",
+      "passes": false,
+      "priority": 1
+    },
+
+    {
+      "id": "F160",
+      "module": "polish",
+      "category": "polish",
+      "description": "响应式适配: 侧边栏在小屏幕自动收起, 表格横向滚动",
+      "passes": false,
+      "priority": 4
+    },
+    {
+      "id": "F161",
+      "module": "polish",
+      "category": "polish",
+      "description": "Loading状态: 数据加载loading, 按钮提交loading",
+      "passes": false,
+      "priority": 3
+    },
+    {
+      "id": "F162",
+      "module": "polish",
+      "category": "polish",
+      "description": "消息提示统一: 操作成功/失败 ElMessage 提示",
+      "passes": false,
+      "priority": 2
+    },
+    {
+      "id": "F163",
+      "module": "polish",
+      "category": "polish",
+      "description": "数据字典: 用户类型/设备状态/预警级别 等枚举值统一管理",
+      "passes": false,
+      "priority": 3
+    }
+  ],
+  "statistics": {
+    "total": 52,
+    "passing": 4,
+    "failing": 48,
+    "completion_percentage": 7.7
+  },
+  "notes": "后端已基本完成, 前端需要从零开始搭建。优先级: 1(必须先做) > 2(核心功能) > 3(增强功能) > 4(锦上添花)"
+}
