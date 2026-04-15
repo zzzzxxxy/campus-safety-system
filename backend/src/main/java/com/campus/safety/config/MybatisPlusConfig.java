@@ -27,27 +27,4 @@ public class MybatisPlusConfig {
         return interceptor;
     }
 
-    /**
-     * 自动填充处理器
-     */
-    @Bean
-    public MetaObjectHandler metaObjectHandler() {
-        return new MetaObjectHandler() {
-            @Override
-            public void insertFill(MetaObject metaObject) {
-                String username = SecurityUtils.getUsername();
-                this.strictInsertFill(metaObject, "createTime", LocalDateTime.class, LocalDateTime.now());
-                this.strictInsertFill(metaObject, "updateTime", LocalDateTime.class, LocalDateTime.now());
-                this.strictInsertFill(metaObject, "createBy", String.class, username);
-                this.strictInsertFill(metaObject, "updateBy", String.class, username);
-            }
-
-            @Override
-            public void updateFill(MetaObject metaObject) {
-                String username = SecurityUtils.getUsername();
-                this.strictUpdateFill(metaObject, "updateTime", LocalDateTime.class, LocalDateTime.now());
-                this.strictUpdateFill(metaObject, "updateBy", String.class, username);
-            }
-        };
-    }
 }

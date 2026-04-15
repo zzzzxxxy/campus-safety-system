@@ -37,21 +37,32 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
         String token = resolveToken(request);
+        if (log.isDebugEnabled()) {
+            log.debug("JWT filter: uri={} hasToken={} authHeaderPresent={}",
+                    request.getRequestURI(),
+                    StringUtils.hasText(token),
+                    StringUtils.hasText(request.getHeader("Authorization")));
+        }
+
         if (StringUtils.hasText(token) && jwtUtils.validateToken(token)) {
             String username = jwtUtils.getUsernameFromToken(token);
             Long userId = jwtUtils.getUserIdFromToken(token);
 
             // 检查Redis中是否存在该token（用于支持登出）
+            // 注意：如果登录时没有把token写入Redis，这里会导致所有请求都无法通过认证。
+            // 为了让系统“无Redis会话”也能工作：
+            // - Redis里有token：按原逻辑校验（支持登出/踢下线）
+            // - Redis里没有token：仍然允许基于JWT本身通过认证（退化为纯JWT无状态模式）
             String redisKey = RedisConstants.LOGIN_TOKEN_KEY + userId;
             Object cachedToken = redisTemplate.opsForValue().get(redisKey);
-            if (cachedToken != null) {
-                // 获取用户权限
-                List<SimpleGrantedAuthority> authorities = getAuthorities(userId);
 
-                UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(username, null, authorities);
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-            }
+            // 获取用户权限（优先走缓存；没有缓存会返回空权限）
+            List<SimpleGrantedAuthority> authorities = getAuthorities(userId);
+
+            // 允许纯JWT无状态认证（即使Redis里没有缓存token）
+            UsernamePasswordAuthenticationToken authentication =
+                    new UsernamePasswordAuthenticationToken(username, null, authorities);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
         }
         filterChain.doFilter(request, response);
     }

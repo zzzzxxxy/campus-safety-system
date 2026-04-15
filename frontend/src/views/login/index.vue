@@ -81,21 +81,46 @@ const loginRules = reactive<FormRules>({
   ]
 })
 
-const handleLogin = () => {
-  loginFormRef.value?.validate(async (valid) => {
-    if (!valid) return
-    loading.value = true
+const doLogin = async () => {
+  if (!loginForm.username || !loginForm.password) {
+    ElMessage.warning('请输入用户名和密码')
+    return
+  }
+
+  loading.value = true
+  try {
+    await userStore.login({ username: loginForm.username, password: loginForm.password })
+
+    // Preload user info (roles/menus) to avoid router guard immediately resetting token
+    // when /auth/info fails.
+    await userStore.getInfo()
+
+    const redirect = (route.query.redirect as string) || '/'
+    await router.push(redirect)
+    ElMessage.success('登录成功')
+  } catch (error: any) {
+    // Error already handled by request interceptor
+  } finally {
+    loading.value = false
+  }
+}
+
+const handleLogin = async () => {
+  // Element Plus Form ref may not be available in some build/auto-import setups.
+  // Fall back to manual validation to avoid blocking login.
+  const form = loginFormRef.value as any
+  if (form && typeof form.validate === 'function') {
     try {
-      await userStore.login(loginForm)
-      const redirect = (route.query.redirect as string) || '/'
-      router.push(redirect)
-      ElMessage.success('登录成功')
-    } catch (error: any) {
-      // Error already handled by request interceptor
-    } finally {
-      loading.value = false
+      const valid = await form.validate()
+      if (!valid) return
+      await doLogin()
+    } catch {
+      // validate() may throw when invalid
+      return
     }
-  })
+  } else {
+    await doLogin()
+  }
 }
 </script>
 
