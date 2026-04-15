@@ -32,6 +32,15 @@ export const useUserStore = defineStore('user', {
       this.userInfo = user
       this.roles = roles
       this.permissions = permissions
+
+      // Persist to localStorage for non-store consumers (e.g., directives)
+      try {
+        localStorage.setItem('roles', JSON.stringify(roles || []))
+        localStorage.setItem('permissions', JSON.stringify(permissions || []))
+      } catch {
+        // ignore
+      }
+
       return res
     },
 
