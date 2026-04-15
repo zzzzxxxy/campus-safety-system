@@ -442,8 +442,8 @@
       "id": "F152",
       "module": "integration",
       "category": "integration",
-      "description": "Vite代理配置: /api -> http://localhost:8080 反向代理",
-      "passes": false,
+      "description": "Vite代理配置: /api -> http://localhost:8088 反向代理（匹配后端 server.port=8088 + context-path=/api）",
+      "passes": true,
       "priority": 1
     },
     {
@@ -481,9 +481,9 @@
   ],
   "statistics": {
     "total": 59,
-    "passing": 18,
-    "failing": 41,
-    "completion_percentage": 30.5
+    "passing": 19,
+    "failing": 40,
+    "completion_percentage": 32.2
   },
   "notes": "后端已基本完成, 前端需要从零开始搭建。优先级: 1(必须先做) > 2(核心功能) > 3(增强功能) > 4(锦上添花)"
 }
