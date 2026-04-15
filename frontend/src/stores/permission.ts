@@ -27,6 +27,40 @@ export interface MenuItem {
     keepAlive?: boolean
   }
   children?: MenuItem[]
+
+  // backend SysMenu compatibility
+  menuName?: string
+  icon?: string
+  visible?: number
+  menuType?: string
+}
+
+function normalizeBackendMenus(menus: any[]): MenuItem[] {
+  const walk = (list: any[]): MenuItem[] => {
+    return (list || [])
+      // filter out button permissions
+      .filter((m) => m && m.menuType !== 'F')
+      .map((m) => {
+        const children = walk(m.children || [])
+        // backend visible: 0=显示, 1=隐藏
+        const hidden = m.visible === 1
+        return {
+          id: m.id,
+          name: m.name || m.path || m.menuName,
+          path: m.path,
+          component: m.component || undefined,
+          redirect: m.redirect,
+          meta: {
+            title: (m.meta && m.meta.title) || m.menuName,
+            icon: (m.meta && m.meta.icon) || m.icon,
+            hidden: (m.meta && m.meta.hidden) ?? hidden,
+            keepAlive: (m.meta && m.meta.keepAlive) || false
+          },
+          children
+        } as MenuItem
+      })
+  }
+  return walk(menus)
 }
 
 function buildRoutes(menus: MenuItem[]): RouteRecordRaw[] {
@@ -55,8 +89,9 @@ export const usePermissionStore = defineStore('permission', {
   }),
 
   actions: {
-    generateRoutes(menus: MenuItem[]) {
-      const accessedRoutes = buildRoutes(menus)
+    generateRoutes(menus: any[]) {
+      const normalizedMenus = normalizeBackendMenus(menus)
+      const accessedRoutes = buildRoutes(normalizedMenus)
       this.addRoutes = accessedRoutes
       this.routes = constantRoutes.concat(accessedRoutes)
       return accessedRoutes

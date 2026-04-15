@@ -17,8 +17,9 @@ export function deleteUser(id: number) {
   return request.delete(`/system/user/${id}`)
 }
 
-export function resetPassword(id: number, password: string) {
-  return request.put(`/system/user/${id}/resetPassword`, { password })
+export function resetPassword(id: number, newPassword: string) {
+  // backend expects request param: newPassword
+  return request.put(`/system/user/${id}/resetPassword`, null, { params: { newPassword } })
 }
 
 // ========== Role ==========
