@@ -38,13 +38,12 @@
       "passes": true,
       "priority": 0
     },
-
     {
       "id": "F010",
       "module": "frontend-scaffold",
       "category": "frontend",
       "description": "前端项目初始化: Vite + Vue 3 + package.json + vite.config.ts + tsconfig + main.ts + App.vue",
-      "passes": false,
+      "passes": true,
       "priority": 1
     },
     {
@@ -52,7 +51,7 @@
       "module": "frontend-scaffold",
       "category": "frontend",
       "description": "安装配置Element Plus (全量引入 + 中文语言包 + 图标注册)",
-      "passes": false,
+      "passes": true,
       "priority": 1
     },
     {
@@ -60,7 +59,7 @@
       "module": "frontend-scaffold",
       "category": "frontend",
       "description": "Axios请求封装: baseURL配置, JWT token拦截器, 401自动跳登录, 错误提示",
-      "passes": false,
+      "passes": true,
       "priority": 1
     },
     {
@@ -68,7 +67,7 @@
       "module": "frontend-scaffold",
       "category": "frontend",
       "description": "Vue Router路由配置: 静态路由(登录/404) + 动态路由加载框架",
-      "passes": false,
+      "passes": true,
       "priority": 1
     },
     {
@@ -95,7 +94,6 @@
       "passes": false,
       "priority": 2
     },
-
     {
       "id": "F020",
       "module": "frontend-login",
@@ -120,7 +118,6 @@
       "passes": false,
       "priority": 1
     },
-
     {
       "id": "F030",
       "module": "frontend-layout",
@@ -153,7 +150,6 @@
       "passes": false,
       "priority": 3
     },
-
     {
       "id": "F040",
       "module": "frontend-dashboard",
@@ -194,7 +190,6 @@
       "passes": false,
       "priority": 3
     },
-
     {
       "id": "F050",
       "module": "frontend-system-user",
@@ -227,7 +222,6 @@
       "passes": false,
       "priority": 2
     },
-
     {
       "id": "F060",
       "module": "frontend-system-role",
@@ -244,7 +238,6 @@
       "passes": false,
       "priority": 2
     },
-
     {
       "id": "F070",
       "module": "frontend-system-menu",
@@ -253,7 +246,6 @@
       "passes": false,
       "priority": 2
     },
-
     {
       "id": "F080",
       "module": "frontend-system-log",
@@ -262,7 +254,6 @@
       "passes": false,
       "priority": 3
     },
-
     {
       "id": "F090",
       "module": "frontend-visitor",
@@ -295,7 +286,6 @@
       "passes": false,
       "priority": 3
     },
-
     {
       "id": "F100",
       "module": "frontend-asset",
@@ -320,7 +310,6 @@
       "passes": false,
       "priority": 2
     },
-
     {
       "id": "F110",
       "module": "frontend-device",
@@ -345,7 +334,6 @@
       "passes": false,
       "priority": 2
     },
-
     {
       "id": "F120",
       "module": "frontend-warning",
@@ -378,7 +366,6 @@
       "passes": false,
       "priority": 3
     },
-
     {
       "id": "F130",
       "module": "frontend-report",
@@ -411,7 +398,6 @@
       "passes": false,
       "priority": 3
     },
-
     {
       "id": "F140",
       "module": "frontend-common",
@@ -436,7 +422,6 @@
       "passes": false,
       "priority": 3
     },
-
     {
       "id": "F150",
       "module": "integration",
@@ -461,7 +446,6 @@
       "passes": false,
       "priority": 1
     },
-
     {
       "id": "F160",
       "module": "polish",
