@@ -37,7 +37,12 @@ public interface SysMenuService {
     void delete(Long id);
 
     /**
-     * 构建菜单树
+     * 查询菜单树（用于菜单管理树形结构）
+     */
+    List<SysMenu> listTree();
+
+    /**
+     * 构建路由菜单树
      */
     List<RouterVO> buildMenuTree(List<SysMenu> menus);
 

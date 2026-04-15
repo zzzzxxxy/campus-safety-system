@@ -1,9 +1,12 @@
 package com.campus.safety.module.system.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.campus.safety.common.base.BaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
+import java.util.List;
 
 /**
  * 系统菜单实体
@@ -42,4 +45,8 @@ public class SysMenu extends BaseEntity {
 
     /** 状态(0-正常 1-禁用) */
     private Integer status;
+
+    /** 子菜单 */
+    @TableField(exist = false)
+    private List<SysMenu> children;
 }

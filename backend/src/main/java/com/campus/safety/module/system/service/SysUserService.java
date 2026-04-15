@@ -14,6 +14,11 @@ import java.util.Set;
 public interface SysUserService {
 
     /**
+     * 根据用户名查询用户
+     */
+    SysUser getByUsername(String username);
+
+    /**
      * 分页查询用户
      */
     PageResult<SysUser> queryPage(SysUserQueryDTO queryDTO);

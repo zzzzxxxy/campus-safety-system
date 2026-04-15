@@ -12,7 +12,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/system/user")
@@ -29,7 +29,7 @@ public class SysUserController {
     @PreAuthorize("hasAuthority('system:user:list')")
     @Log(module = "用户管理", description = "分页查询")
     public R<PageResult<SysUser>> page(SysUserQueryDTO queryDTO) {
-        PageResult<SysUser> pageResult = sysUserService.page(queryDTO);
+        PageResult<SysUser> pageResult = sysUserService.queryPage(queryDTO);
         return R.ok(pageResult);
     }
 

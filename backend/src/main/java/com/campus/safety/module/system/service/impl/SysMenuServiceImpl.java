@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -84,6 +85,33 @@ public class SysMenuServiceImpl implements SysMenuService {
         LambdaQueryWrapper<SysRoleMenu> roleMenuWrapper = new LambdaQueryWrapper<>();
         roleMenuWrapper.eq(SysRoleMenu::getMenuId, id);
         sysRoleMenuMapper.delete(roleMenuWrapper);
+    }
+
+    @Override
+    public List<SysMenu> listTree() {
+        List<SysMenu> all = listAll();
+        if (all == null || all.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        // parentId -> children
+        Map<Long, List<SysMenu>> childrenMap = all.stream()
+                .collect(Collectors.groupingBy(m -> m.getParentId() == null ? 0L : m.getParentId()));
+
+        // roots: parentId == 0
+        List<SysMenu> roots = childrenMap.getOrDefault(0L, new ArrayList<>());
+        for (SysMenu root : roots) {
+            fillChildren(root, childrenMap);
+        }
+        return roots;
+    }
+
+    private void fillChildren(SysMenu parent, Map<Long, List<SysMenu>> childrenMap) {
+        List<SysMenu> children = childrenMap.getOrDefault(parent.getId(), new ArrayList<>());
+        parent.setChildren(children);
+        for (SysMenu child : children) {
+            fillChildren(child, childrenMap);
+        }
     }
 
     @Override

@@ -11,7 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -28,7 +28,7 @@ public class SysRoleController {
     @PreAuthorize("hasAuthority('system:role:list')")
     @Log(module = "角色管理", description = "分页查询")
     public R<PageResult<SysRole>> page(SysRoleQueryDTO queryDTO) {
-        PageResult<SysRole> pageResult = sysRoleService.page(queryDTO);
+        PageResult<SysRole> pageResult = sysRoleService.queryPage(queryDTO);
         return R.ok(pageResult);
     }
 
@@ -39,7 +39,7 @@ public class SysRoleController {
     @PreAuthorize("hasAuthority('system:role:list')")
     @Log(module = "角色管理", description = "查询列表")
     public R<List<SysRole>> list() {
-        List<SysRole> list = sysRoleService.list();
+        List<SysRole> list = sysRoleService.listAll();
         return R.ok(list);
     }
 

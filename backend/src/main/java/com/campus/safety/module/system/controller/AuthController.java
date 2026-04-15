@@ -7,7 +7,9 @@ import com.campus.safety.common.utils.JwtUtils;
 import com.campus.safety.module.system.dto.LoginDTO;
 import com.campus.safety.module.system.dto.RegisterDTO;
 import com.campus.safety.module.system.dto.SysUserDTO;
+import com.campus.safety.module.system.entity.SysMenu;
 import com.campus.safety.module.system.entity.SysUser;
+import com.campus.safety.module.system.service.SysMenuService;
 import com.campus.safety.module.system.service.SysUserService;
 import com.campus.safety.module.system.vo.LoginVO;
 import com.campus.safety.module.system.vo.UserInfoVO;
@@ -19,7 +21,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Set;
 
@@ -29,6 +31,7 @@ import java.util.Set;
 public class AuthController {
 
     private final SysUserService sysUserService;
+    private final SysMenuService sysMenuService;
     private final AuthenticationManager authenticationManager;
     private final JwtUtils jwtUtils;
     private final PasswordEncoder passwordEncoder;
@@ -114,10 +117,13 @@ public class AuthController {
         }
 
         // 查询角色keys
-        Set<String> roles = sysUserService.getRoleKeysByUserId(user.getId());
+        List<String> roles = sysUserService.getRoleKeysByUserId(user.getId());
 
         // 查询权限perms
         Set<String> permissions = sysUserService.getPermissionsByUserId(user.getId());
+
+        // 查询菜单树（用于前端动态路由/侧边栏）
+        List<SysMenu> menus = sysMenuService.listTree();
 
         // 构建UserInfoVO
         user.setPassword(null);
@@ -125,6 +131,7 @@ public class AuthController {
         userInfoVO.setUser(user);
         userInfoVO.setRoles(roles);
         userInfoVO.setPermissions(permissions);
+        userInfoVO.setMenus(menus);
 
         return R.ok(userInfoVO);
     }

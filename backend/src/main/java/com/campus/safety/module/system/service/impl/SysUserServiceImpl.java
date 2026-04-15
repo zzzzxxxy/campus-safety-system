@@ -34,6 +34,16 @@ public class SysUserServiceImpl implements SysUserService {
     private final PasswordEncoder passwordEncoder;
 
     @Override
+    public SysUser getByUsername(String username) {
+        if (!StringUtils.hasText(username)) {
+            return null;
+        }
+        LambdaQueryWrapper<SysUser> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(SysUser::getUsername, username);
+        return sysUserMapper.selectOne(wrapper);
+    }
+
+    @Override
     public PageResult<SysUser> queryPage(SysUserQueryDTO queryDTO) {
         LambdaQueryWrapper<SysUser> wrapper = new LambdaQueryWrapper<>();
         wrapper.like(StringUtils.hasText(queryDTO.getUsername()),
