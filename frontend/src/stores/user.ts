@@ -7,6 +7,7 @@ interface UserState {
   userInfo: Record<string, any>
   roles: string[]
   permissions: string[]
+  menus: any[]
 }
 
 export const useUserStore = defineStore('user', {
@@ -14,7 +15,8 @@ export const useUserStore = defineStore('user', {
     token: localStorage.getItem('token') || '',
     userInfo: {},
     roles: [],
-    permissions: []
+    permissions: [],
+    menus: []
   }),
 
   actions: {
@@ -28,10 +30,11 @@ export const useUserStore = defineStore('user', {
 
     async getInfo() {
       const res = await getInfoApi()
-      const { user, roles, permissions } = res.data.data
+      const { user, roles, permissions, menus } = res.data.data as any
       this.userInfo = user
-      this.roles = roles
-      this.permissions = permissions
+      this.roles = roles || []
+      this.permissions = permissions || []
+      this.menus = menus || []
 
       // Persist to localStorage for non-store consumers (e.g., directives)
       try {
@@ -58,6 +61,7 @@ export const useUserStore = defineStore('user', {
       this.userInfo = {}
       this.roles = []
       this.permissions = []
+      this.menus = []
       localStorage.removeItem('token')
     }
   }

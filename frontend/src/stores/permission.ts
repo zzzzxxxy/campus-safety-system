@@ -2,6 +2,9 @@ import { defineStore } from 'pinia'
 import { constantRoutes } from '@/router'
 import type { RouteRecordRaw } from 'vue-router'
 
+// A simple router-view wrapper for directory menus
+import ParentView from '@/layout/components/ParentView.vue'
+
 // Dynamic import map: resolves component path strings to actual component imports
 const viewModules = import.meta.glob('../views/**/*.vue')
 
@@ -44,10 +47,11 @@ function normalizeBackendMenus(menus: any[]): MenuItem[] {
         const children = walk(m.children || [])
         // backend visible: 0=显示, 1=隐藏
         const hidden = m.visible === 1
+        const fullPath = m.path?.startsWith('/') ? m.path : `/${m.path}`
         return {
           id: m.id,
           name: m.name || m.path || m.menuName,
-          path: m.path,
+          path: fullPath,
           component: m.component || undefined,
           redirect: m.redirect,
           meta: {
@@ -56,7 +60,10 @@ function normalizeBackendMenus(menus: any[]): MenuItem[] {
             hidden: (m.meta && m.meta.hidden) ?? hidden,
             keepAlive: (m.meta && m.meta.keepAlive) || false
           },
-          children
+          children,
+
+          // keep raw fields for downstream
+          menuType: m.menuType
         } as MenuItem
       })
   }
@@ -65,12 +72,17 @@ function normalizeBackendMenus(menus: any[]): MenuItem[] {
 
 function buildRoutes(menus: MenuItem[]): RouteRecordRaw[] {
   return menus.map((menu) => {
+    // backend menu path is often relative like 'system/user'
+    const fullPath = menu.path?.startsWith('/') ? menu.path : `/${menu.path}`
+
     const route: RouteRecordRaw = {
-      path: menu.path,
-      name: menu.name || menu.path,
+      path: fullPath,
+      name: menu.name || fullPath,
       meta: menu.meta || {},
       redirect: menu.redirect,
-      component: menu.component ? resolveComponent(menu.component) : undefined,
+      component: menu.component
+        ? resolveComponent(menu.component)
+        : (menu.menuType === 'M' ? ParentView : undefined),
       children: menu.children ? buildRoutes(menu.children) : undefined
     } as RouteRecordRaw
     return route

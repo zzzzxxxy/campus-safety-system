@@ -99,7 +99,7 @@
       "module": "frontend-login",
       "category": "frontend",
       "description": "登录页面: 用户名/密码表单, 表单验证, 登录API调用, token存储, 跳转首页",
-      "passes": false,
+      "passes": true,
       "priority": 1
     },
     {
@@ -115,7 +115,7 @@
       "module": "frontend-login",
       "category": "frontend",
       "description": "路由守卫: 未登录跳登录页, 已登录获取用户信息, 动态路由注入",
-      "passes": false,
+      "passes": true,
       "priority": 1
     },
     {
@@ -123,7 +123,7 @@
       "module": "frontend-layout",
       "category": "frontend",
       "description": "主布局组件: 左侧边栏 + 顶部头部 + 主内容区 + 面包屑",
-      "passes": false,
+      "passes": true,
       "priority": 1
     },
     {
@@ -481,9 +481,9 @@
   ],
   "statistics": {
     "total": 59,
-    "passing": 12,
-    "failing": 47,
-    "completion_percentage": 20.3
+    "passing": 15,
+    "failing": 44,
+    "completion_percentage": 25.4
   },
   "notes": "后端已基本完成, 前端需要从零开始搭建。优先级: 1(必须先做) > 2(核心功能) > 3(增强功能) > 4(锦上添花)"
 }

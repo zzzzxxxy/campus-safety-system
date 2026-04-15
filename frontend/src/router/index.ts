@@ -80,10 +80,8 @@ router.beforeEach(async (to, _from, next) => {
       } else {
         try {
           // Get user info
-          const res = await userStore.getInfo()
-          // Get menus from user info response and generate routes
-          // Backend /auth/info currently does not return menus, so default to []
-          const menus = (res.data.data as any).menus || []
+          await userStore.getInfo()
+          const menus = userStore.menus || []
           const accessRoutes = permissionStore.generateRoutes(menus)
 
           // Add dynamic routes to router
