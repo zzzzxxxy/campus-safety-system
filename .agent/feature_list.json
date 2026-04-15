@@ -195,7 +195,7 @@
       "module": "frontend-system-user",
       "category": "frontend",
       "description": "用户管理页面: 用户列表(分页/搜索/状态筛选), 调用 /api/system/user/page",
-      "passes": false,
+      "passes": true,
       "priority": 2
     },
     {
@@ -203,7 +203,7 @@
       "module": "frontend-system-user",
       "category": "frontend",
       "description": "用户管理: 新增用户对话框(用户名/密码/昵称/手机/邮箱/类型), 表单验证",
-      "passes": false,
+      "passes": true,
       "priority": 2
     },
     {
@@ -211,7 +211,7 @@
       "module": "frontend-system-user",
       "category": "frontend",
       "description": "用户管理: 编辑用户, 重置密码, 启用/禁用, 删除(确认框)",
-      "passes": false,
+      "passes": true,
       "priority": 2
     },
     {
@@ -481,9 +481,9 @@
   ],
   "statistics": {
     "total": 59,
-    "passing": 23,
-    "failing": 36,
-    "completion_percentage": 39.0
+    "passing": 26,
+    "failing": 33,
+    "completion_percentage": 44.1
   },
   "notes": "后端已基本完成, 前端需要从零开始搭建。优先级: 1(必须先做) > 2(核心功能) > 3(增强功能) > 4(锦上添花)"
 }

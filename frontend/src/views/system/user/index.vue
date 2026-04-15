@@ -50,11 +50,20 @@
             <el-tag type="info">{{ userTypeLabel(row.userType) }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="status" label="状态" width="100">
+        <el-table-column prop="status" label="状态" width="150">
           <template #default="{ row }">
-            <el-tag :type="Number(row.status) === 0 ? 'success' : 'danger'">
-              {{ Number(row.status) === 0 ? '正常' : '禁用' }}
-            </el-tag>
+            <div class="status-cell">
+              <el-tag :type="Number(row.status) === 0 ? 'success' : 'danger'">
+                {{ Number(row.status) === 0 ? '正常' : '禁用' }}
+              </el-tag>
+              <el-switch
+                v-model="row.status"
+                :active-value="0"
+                :inactive-value="1"
+                :before-change="() => handleToggleStatus(row)"
+                size="small"
+              />
+            </div>
           </template>
         </el-table-column>
         <el-table-column prop="createTime" label="创建时间" min-width="170" />
@@ -265,8 +274,29 @@ const form = reactive<UserDTO>({
 })
 
 const rules = reactive<FormRules>({
-  username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
-  password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
+  username: [
+    { required: true, message: '请输入用户名', trigger: 'blur' },
+    { min: 2, max: 20, message: '用户名长度 2-20 个字符', trigger: 'blur' }
+  ],
+  password: [
+    { required: true, message: '请输入密码', trigger: 'blur' },
+    { min: 5, max: 20, message: '密码长度在 5 到 20 个字符', trigger: 'blur' }
+  ],
+  nickname: [{ max: 20, message: '昵称最多 20 个字符', trigger: 'blur' }],
+  phone: [
+    {
+      pattern: /^1\d{10}$/,
+      message: '手机号格式不正确',
+      trigger: 'blur'
+    }
+  ],
+  email: [
+    {
+      type: 'email',
+      message: '邮箱格式不正确',
+      trigger: 'blur'
+    }
+  ],
   userType: [{ required: true, message: '请选择用户类型', trigger: 'change' }],
   status: [{ required: true, message: '请选择状态', trigger: 'change' }]
 })
@@ -413,6 +443,8 @@ async function handleSubmit() {
         await addUser(dto)
         ElMessage.success('新增成功')
       } else {
+        // 编辑时后端 update() 只有 roleIds 非空才会更新关联；
+        // 为了支持“清空角色”，这里把空数组也传下去（不传则无法清空）。
         await updateUser(dto)
         ElMessage.success('保存成功')
       }
@@ -439,6 +471,41 @@ async function handleDelete(row: SysUser) {
     pageNum.value -= 1
   }
   fetchList()
+}
+
+async function handleToggleStatus(row: SysUser) {
+  const nextStatus = Number(row.status) === 0 ? 1 : 0
+  try {
+    await ElMessageBox.confirm(
+      `确认将用户【${row.username}】状态切换为【${nextStatus === 0 ? '正常' : '禁用'}】吗？`,
+      '提示',
+      {
+        type: 'warning',
+        confirmButtonText: '确定',
+        cancelButtonText: '取消'
+      }
+    )
+
+    // 复用编辑接口：只提交必要字段（后端 BeanUtils.copyProperties 会覆盖 status）
+    await updateUser({
+      id: row.id,
+      username: row.username,
+      nickname: row.nickname,
+      phone: row.phone,
+      email: row.email,
+      avatar: row.avatar,
+      userType: row.userType,
+      status: nextStatus,
+      roleIds: Array.isArray(row.roleIds) ? row.roleIds : []
+    })
+
+    ElMessage.success('状态已更新')
+    row.status = nextStatus
+    return true
+  } catch (e) {
+    // cancel / request failed -> keep switch unchanged
+    return false
+  }
 }
 
 function openResetPwd(row: SysUser) {
@@ -495,5 +562,11 @@ onMounted(async () => {
   display: flex;
   justify-content: flex-end;
   margin-top: 12px;
+}
+
+.status-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 </style>
