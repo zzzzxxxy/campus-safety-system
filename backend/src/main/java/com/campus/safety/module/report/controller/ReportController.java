@@ -25,7 +25,7 @@ public class ReportController {
      * 获取仪表盘数据
      */
     @GetMapping("/dashboard")
-    @PreAuthorize("hasAuthority('report:view')")
+    @PreAuthorize("hasAuthority('report:dashboard:view')")
     @Log(module = "报表统计", description = "查看仪表盘")
     public R<DashboardVO> dashboard() {
         return R.ok(reportService.getDashboard());
@@ -35,7 +35,7 @@ public class ReportController {
      * 获取访客统计
      */
     @GetMapping("/visitor-stats")
-    @PreAuthorize("hasAuthority('report:view')")
+    @PreAuthorize("hasAuthority('report:dashboard:view')")
     @Log(module = "报表统计", description = "查看访客统计")
     public R<VisitorStatsVO> visitorStats(
             @RequestParam String startDate,
@@ -47,7 +47,7 @@ public class ReportController {
      * 获取设备统计
      */
     @GetMapping("/device-stats")
-    @PreAuthorize("hasAuthority('report:view')")
+    @PreAuthorize("hasAuthority('report:dashboard:view')")
     @Log(module = "报表统计", description = "查看设备统计")
     public R<DeviceStatsVO> deviceStats() {
         return R.ok(reportService.getDeviceStats());
@@ -57,7 +57,7 @@ public class ReportController {
      * 获取预警统计
      */
     @GetMapping("/warning-stats")
-    @PreAuthorize("hasAuthority('report:view')")
+    @PreAuthorize("hasAuthority('report:dashboard:view')")
     @Log(module = "报表统计", description = "查看预警统计")
     public R<WarningStatsVO> warningStats(
             @RequestParam String startDate,
@@ -69,7 +69,7 @@ public class ReportController {
      * 获取资产统计
      */
     @GetMapping("/asset-stats")
-    @PreAuthorize("hasAuthority('report:view')")
+    @PreAuthorize("hasAuthority('report:dashboard:view')")
     @Log(module = "报表统计", description = "查看资产统计")
     public R<AssetStatsVO> assetStats() {
         return R.ok(reportService.getAssetStats());
