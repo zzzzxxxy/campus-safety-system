@@ -112,18 +112,21 @@ public class SysUserServiceImpl implements SysUserService {
         sysUserMapper.updateById(existing);
 
         // 更新用户角色关联
-        if (!CollectionUtils.isEmpty(dto.getRoleIds())) {
+        // roleIds == null: 不更新角色关联；roleIds 为空数组: 清空所有角色
+        if (dto.getRoleIds() != null) {
             // 先删除旧关联
             LambdaQueryWrapper<SysUserRole> deleteWrapper = new LambdaQueryWrapper<>();
             deleteWrapper.eq(SysUserRole::getUserId, dto.getId());
             sysUserRoleMapper.delete(deleteWrapper);
 
             // 再插入新关联
-            for (Long roleId : dto.getRoleIds()) {
-                SysUserRole userRole = new SysUserRole();
-                userRole.setUserId(dto.getId());
-                userRole.setRoleId(roleId);
-                sysUserRoleMapper.insert(userRole);
+            if (!CollectionUtils.isEmpty(dto.getRoleIds())) {
+                for (Long roleId : dto.getRoleIds()) {
+                    SysUserRole userRole = new SysUserRole();
+                    userRole.setUserId(dto.getId());
+                    userRole.setRoleId(roleId);
+                    sysUserRoleMapper.insert(userRole);
+                }
             }
         }
     }
