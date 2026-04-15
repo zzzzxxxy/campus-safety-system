@@ -1,5 +1,5 @@
 <template>
-  <div class="dashboard-container">
+  <div class="dashboard-container" v-loading="loading">
     <div class="welcome-section">
       <h2 class="welcome-title">欢迎使用校园安全管理系统</h2>
       <p class="welcome-desc">Campus Safety Management System</p>
@@ -100,14 +100,61 @@
 </template>
 
 <script setup lang="ts">
-import { reactive } from 'vue'
+import { computed, onMounted, reactive, ref } from 'vue'
+import { ElMessage } from 'element-plus'
 import { Warning, User, Monitor, Document } from '@element-plus/icons-vue'
 
-const stats = reactive({
-  warningCount: 12,
-  visitorCount: 58,
-  assetCount: 236,
-  reportCount: 7
+import { getDashboard } from '@/api/report'
+
+type TrendItem = { date: string; count: number }
+
+type DashboardVO = {
+  todayVisitorCount?: number
+  totalDeviceCount?: number
+  onlineDeviceCount?: number
+  unhandledWarningCount?: number
+  totalAssetCount?: number
+  todayWarningCount?: number
+  visitorTrend?: TrendItem[]
+  warningTrend?: TrendItem[]
+}
+
+const loading = ref(false)
+const dashboard = reactive<DashboardVO>({
+  todayVisitorCount: 0,
+  totalDeviceCount: 0,
+  onlineDeviceCount: 0,
+  unhandledWarningCount: 0,
+  totalAssetCount: 0,
+  todayWarningCount: 0,
+  visitorTrend: [],
+  warningTrend: []
+})
+
+const stats = computed(() => {
+  return {
+    warningCount: dashboard.unhandledWarningCount ?? 0,
+    visitorCount: dashboard.todayVisitorCount ?? 0,
+    assetCount: dashboard.totalAssetCount ?? 0,
+    reportCount: dashboard.totalDeviceCount ?? 0
+  }
+})
+
+async function fetchDashboard() {
+  loading.value = true
+  try {
+    const res = await getDashboard()
+    const data = (res as any)?.data?.data as DashboardVO
+    Object.assign(dashboard, data || {})
+  } catch (e: any) {
+    ElMessage.error(e?.message || '获取仪表盘数据失败')
+  } finally {
+    loading.value = false
+  }
+}
+
+onMounted(() => {
+  fetchDashboard()
 })
 </script>
 
