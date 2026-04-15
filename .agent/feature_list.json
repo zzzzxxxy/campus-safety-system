@@ -75,7 +75,7 @@
       "module": "frontend-scaffold",
       "category": "frontend",
       "description": "Pinia状态管理: user store (token/userInfo/permissions) + permission store (动态路由)",
-      "passes": false,
+      "passes": true,
       "priority": 1
     },
     {
@@ -83,7 +83,7 @@
       "module": "frontend-scaffold",
       "category": "frontend",
       "description": "全局样式: CSS变量定义, reset样式, Element Plus主题覆盖, 响应式断点",
-      "passes": false,
+      "passes": true,
       "priority": 1
     },
     {
@@ -91,7 +91,7 @@
       "module": "frontend-scaffold",
       "category": "frontend",
       "description": "权限指令 v-permission: 按钮级权限控制自定义指令",
-      "passes": false,
+      "passes": true,
       "priority": 2
     },
     {
@@ -403,7 +403,7 @@
       "module": "frontend-common",
       "category": "frontend",
       "description": "通用分页组件封装: 支持pageNum/pageSize/total, 页码切换回调",
-      "passes": false,
+      "passes": true,
       "priority": 2
     },
     {
