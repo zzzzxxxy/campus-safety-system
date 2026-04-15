@@ -6,7 +6,9 @@
     </div>
     <el-scrollbar>
       <el-menu
+        :key="menuKey"
         :default-active="activeMenu"
+        :default-openeds="openeds"
         :collapse="collapse"
         :collapse-transition="false"
         background-color="#f6f5f4"
@@ -53,6 +55,18 @@ const menuRoutes = computed(() => {
     (r) => !r.meta?.hidden && r.path !== '/login' && r.path !== '/404'
   )
 })
+
+// ensure current active path's ancestors are expanded
+const openeds = computed(() => {
+  const matched = route.matched || []
+  const paths = matched
+    .map((m) => m.path)
+    .filter((p) => p && p !== '/' && p !== '/login' && p !== '/404')
+  // exclude leaf itself (last) -> open parents only
+  return paths.slice(0, -1)
+})
+
+const menuKey = computed(() => `${activeMenu.value}-${openeds.value.join(',')}`)
 </script>
 
 <style scoped lang="scss">

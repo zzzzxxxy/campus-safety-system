@@ -16,6 +16,7 @@ export const constantRoutes: RouteRecordRaw[] = [
   },
   {
     path: '/',
+    name: 'Layout',
     component: () => import('@/layout/index.vue'),
     redirect: '/dashboard',
     meta: { title: '首页', hidden: false },
@@ -39,11 +40,26 @@ const router = createRouter({
   scrollBehavior: () => ({ top: 0 })
 })
 
+// Ensure dynamic routes are nested under Layout for correct sidebar/breadcrumb.
+const LAYOUT_NAME = 'Layout'
+
+
 // White list - routes that don't require authentication
 const whiteList = ['/login', '/404']
 
 // Flag to track if dynamic routes have been added
 let hasAddedRoutes = false
+
+function loadPersistedMenus(): any[] {
+  try {
+    const raw = localStorage.getItem('menus')
+    if (!raw) return []
+    const parsed = JSON.parse(raw)
+    return Array.isArray(parsed) ? parsed : []
+  } catch {
+    return []
+  }
+}
 
 export function resetRouter() {
   hasAddedRoutes = false
@@ -74,8 +90,9 @@ router.beforeEach(async (to, _from, next) => {
       next({ path: '/' })
     } else {
       // Check if user info has been loaded
-      const hasUserInfo = userStore.roles && userStore.roles.length > 0
-      if (hasUserInfo) {
+      const hasUserInfo = (userStore.roles && userStore.roles.length > 0)
+      const hasRoutes = (permissionStore.routes && permissionStore.routes.length > 0)
+      if (hasUserInfo && hasRoutes) {
         next()
       } else {
         try {
@@ -84,9 +101,9 @@ router.beforeEach(async (to, _from, next) => {
           const menus = userStore.menus || []
           const accessRoutes = permissionStore.generateRoutes(menus)
 
-          // Add dynamic routes to router
+          // Add dynamic routes to router (nest under Layout)
           accessRoutes.forEach((route: RouteRecordRaw) => {
-            router.addRoute(route)
+            router.addRoute(LAYOUT_NAME, route)
           })
 
           // Add catch-all 404 route last
@@ -102,6 +119,25 @@ router.beforeEach(async (to, _from, next) => {
           // Use replace to navigate to ensure the route is found
           next({ ...to, replace: true })
         } catch (error) {
+          // If refresh happens while backend is temporarily unavailable, try using cached menus
+          const cachedMenus = loadPersistedMenus()
+          if (cachedMenus.length) {
+            const accessRoutes = permissionStore.generateRoutes(cachedMenus)
+            accessRoutes.forEach((route: RouteRecordRaw) => {
+              router.addRoute(LAYOUT_NAME, route)
+            })
+            if (!hasAddedRoutes) {
+              router.addRoute({
+                path: '/:pathMatch(.*)*',
+                redirect: '/404',
+                meta: { hidden: true }
+              })
+              hasAddedRoutes = true
+            }
+            next({ ...to, replace: true })
+            return
+          }
+
           // Failed to get user info, reset token and redirect to login
           userStore.resetToken()
           next(`/login?redirect=${to.path}`)

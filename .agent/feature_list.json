@@ -4,7 +4,7 @@
     "backend": "Spring Boot 3 + MyBatis-Plus + MySQL + Redis + JWT + Spring Security",
     "frontend": "Vue 3 + Vite + Element Plus + Pinia + Vue Router + ECharts + Axios"
   },
-  "last_updated": "2026-04-13",
+  "last_updated": "2026-04-16",
   "features": [
     {
       "id": "F001",
@@ -131,7 +131,7 @@
       "module": "frontend-layout",
       "category": "frontend",
       "description": "侧边栏: 根据用户菜单权限动态渲染, 支持折叠/展开, 图标显示, 多级菜单",
-      "passes": false,
+      "passes": true,
       "priority": 1
     },
     {
@@ -139,7 +139,7 @@
       "module": "frontend-layout",
       "category": "frontend",
       "description": "头部组件: 折叠按钮, 面包屑导航, 用户头像下拉菜单(修改密码/退出登录)",
-      "passes": false,
+      "passes": true,
       "priority": 1
     },
     {
@@ -427,7 +427,7 @@
       "module": "integration",
       "category": "integration",
       "description": "前后端联调: 登录流程 (登录->获取token->获取用户信息->获取菜单->渲染)",
-      "passes": false,
+      "passes": true,
       "priority": 1
     },
     {
@@ -481,9 +481,9 @@
   ],
   "statistics": {
     "total": 59,
-    "passing": 15,
-    "failing": 44,
-    "completion_percentage": 25.4
+    "passing": 18,
+    "failing": 41,
+    "completion_percentage": 30.5
   },
   "notes": "后端已基本完成, 前端需要从零开始搭建。优先级: 1(必须先做) > 2(核心功能) > 3(增强功能) > 4(锦上添花)"
 }

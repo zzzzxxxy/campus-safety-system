@@ -14,7 +14,11 @@
     <div class="header-right">
       <el-dropdown trigger="click" @command="handleCommand">
         <div class="user-info">
-          <el-avatar :size="30" :icon="UserFilled" />
+          <el-avatar
+            :size="30"
+            :src="avatarUrl"
+            :icon="UserFilled"
+          />
           <span class="username">{{ displayName }}</span>
           <el-icon :size="14"><ArrowDown /></el-icon>
         </div>
@@ -62,9 +66,17 @@ const emit = defineEmits<{
 const userStore = useUserStore()
 
 const displayName = computed(() => {
-  return userStore.userInfo?.nickName
+  return (
+    userStore.userInfo?.nickName
+    || userStore.userInfo?.nickname
     || userStore.userInfo?.username
     || '管理员'
+  )
+})
+
+const avatarUrl = computed(() => {
+  const v = userStore.userInfo?.avatar
+  return v ? String(v) : ''
 })
 
 function toggleCollapse() {

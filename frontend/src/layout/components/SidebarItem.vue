@@ -1,7 +1,18 @@
 <template>
   <template v-if="!item.meta?.hidden">
-    <!-- Single menu item (no children or only one visible child) -->
-    <template v-if="!hasVisibleChildren">
+    <!-- Leaf menu item -->
+    <el-menu-item v-if="!hasChildren" :index="itemFullPath">
+      <el-icon v-if="item.meta?.icon">
+        <component :is="item.meta.icon" />
+      </el-icon>
+      <template #title>
+        <span>{{ item.meta?.title }}</span>
+      </template>
+    </el-menu-item>
+
+    <!-- Has children: render submenu (or flatten if only one child) -->
+    <template v-else>
+      <!-- flatten when only one visible child -->
       <el-menu-item
         v-if="onlyOneChild"
         :index="resolvePath(onlyOneChild.path)"
@@ -13,23 +24,23 @@
           <span>{{ onlyOneChild.meta?.title || item.meta?.title }}</span>
         </template>
       </el-menu-item>
-    </template>
 
-    <!-- Sub menu with multiple children -->
-    <el-sub-menu v-else :index="resolvePath(item.path)">
-      <template #title>
-        <el-icon v-if="item.meta?.icon">
-          <component :is="item.meta.icon" />
-        </el-icon>
-        <span>{{ item.meta?.title }}</span>
-      </template>
-      <sidebar-item
-        v-for="child in visibleChildren"
-        :key="child.path"
-        :item="child"
-        :base-path="resolvePath(child.path)"
-      />
-    </el-sub-menu>
+      <el-sub-menu v-else :index="itemFullPath">
+        <template #title>
+          <el-icon v-if="item.meta?.icon">
+            <component :is="item.meta.icon" />
+          </el-icon>
+          <span>{{ item.meta?.title }}</span>
+        </template>
+
+        <sidebar-item
+          v-for="child in visibleChildren"
+          :key="child.path"
+          :item="child"
+          :base-path="resolvePath(child.path)"
+        />
+      </el-sub-menu>
+    </template>
   </template>
 </template>
 
@@ -39,31 +50,29 @@ import type { RouteRecordRaw } from 'vue-router'
 
 const props = defineProps<{
   item: RouteRecordRaw
-  basePath?: string
+  basePath: string
 }>()
 
+const itemFullPath = computed(() => props.basePath)
+
 function resolvePath(path: string): string {
+  if (!path) return props.basePath
   if (path.startsWith('/')) return path
   const base = props.basePath || ''
+  if (!base) return `/${path}`
   if (base.endsWith('/')) return base + path
-  return base ? `${base}/${path}` : path
+  return `${base}/${path}`
 }
 
 const visibleChildren = computed(() => {
   return (props.item.children || []).filter((c) => !c.meta?.hidden)
 })
 
-const hasVisibleChildren = computed(() => {
-  return visibleChildren.value.length > 1
-})
+const hasChildren = computed(() => visibleChildren.value.length > 0)
 
-const onlyOneChild = computed(() => {
+const onlyOneChild = computed<RouteRecordRaw | null>(() => {
   if (visibleChildren.value.length === 1) {
     return visibleChildren.value[0]
-  }
-  // No children, show the item itself
-  if (visibleChildren.value.length === 0) {
-    return { ...props.item, path: '' }
   }
   return null
 })

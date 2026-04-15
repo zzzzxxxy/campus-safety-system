@@ -47,11 +47,12 @@ function normalizeBackendMenus(menus: any[]): MenuItem[] {
         const children = walk(m.children || [])
         // backend visible: 0=显示, 1=隐藏
         const hidden = m.visible === 1
-        const fullPath = m.path?.startsWith('/') ? m.path : `/${m.path}`
+
         return {
           id: m.id,
           name: m.name || m.path || m.menuName,
-          path: fullPath,
+          // IMPORTANT: keep backend path as-is (usually relative). We'll compose full paths in buildRoutes
+          path: m.path,
           component: m.component || undefined,
           redirect: m.redirect,
           meta: {
@@ -70,25 +71,40 @@ function normalizeBackendMenus(menus: any[]): MenuItem[] {
   return walk(menus)
 }
 
-function buildRoutes(menus: MenuItem[]): RouteRecordRaw[] {
+function joinPath(parent: string, child: string) {
+  const p = (parent || '').replace(/\/+$/, '')
+  const c = (child || '').replace(/^\/+/, '')
+  if (!p) return `/${c}`
+  if (!c) return p || '/'
+  return `${p}/${c}`
+}
+
+function buildRoutes(menus: MenuItem[], parentPath = ''): RouteRecordRaw[] {
   return menus.map((menu) => {
-    // backend menu path is often relative like 'system/user'
-    const fullPath = menu.path?.startsWith('/') ? menu.path : `/${menu.path}`
+    const rawPath = menu.path || ''
+
+    // For nested routes, child path must be RELATIVE, otherwise it becomes root and breaks matched/breadcrumb/opened.
+    const isRoot = !parentPath
+    const routePath = isRoot ? (rawPath.startsWith('/') ? rawPath : `/${rawPath}`) : rawPath.replace(/^\//, '')
+
+    const fullPath = isRoot ? routePath : joinPath(parentPath, routePath)
 
     const route: RouteRecordRaw = {
-      path: fullPath,
-      name: menu.name || fullPath,
+      path: routePath,
+      name: (menu.name || fullPath).replace(/\//g, '_'),
       meta: menu.meta || {},
       redirect: menu.redirect,
       component: menu.component
         ? resolveComponent(menu.component)
         : (menu.menuType === 'M' ? ParentView : undefined),
-      children: menu.children ? buildRoutes(menu.children) : undefined
+      children: menu.children && menu.children.length
+        ? buildRoutes(menu.children, fullPath)
+        : undefined
     } as RouteRecordRaw
+
     return route
   })
 }
-
 interface PermissionState {
   routes: RouteRecordRaw[]
   addRoutes: RouteRecordRaw[]
@@ -101,6 +117,11 @@ export const usePermissionStore = defineStore('permission', {
   }),
 
   actions: {
+    resetRoutes() {
+      this.routes = []
+      this.addRoutes = []
+    },
+
     generateRoutes(menus: any[]) {
       const normalizedMenus = normalizeBackendMenus(menus)
       const accessedRoutes = buildRoutes(normalizedMenus)

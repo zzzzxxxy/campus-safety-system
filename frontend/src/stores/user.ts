@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { login as loginApi, getInfo as getInfoApi, logout as logoutApi } from '@/api/auth'
-import router from '@/router'
+import router, { resetRouter } from '@/router'
 
 interface UserState {
   token: string
@@ -38,8 +38,9 @@ export const useUserStore = defineStore('user', {
 
       // Persist to localStorage for non-store consumers (e.g., directives)
       try {
-        localStorage.setItem('roles', JSON.stringify(roles || []))
-        localStorage.setItem('permissions', JSON.stringify(permissions || []))
+        localStorage.setItem('roles', JSON.stringify(this.roles || []))
+        localStorage.setItem('permissions', JSON.stringify(this.permissions || []))
+        localStorage.setItem('menus', JSON.stringify(this.menus || []))
       } catch {
         // ignore
       }
@@ -62,7 +63,33 @@ export const useUserStore = defineStore('user', {
       this.roles = []
       this.permissions = []
       this.menus = []
-      localStorage.removeItem('token')
+
+      // Clear persistent auth state
+      try {
+        localStorage.removeItem('token')
+        localStorage.removeItem('roles')
+        localStorage.removeItem('permissions')
+        localStorage.removeItem('menus')
+      } catch {
+        // ignore
+      }
+
+      // Reset dynamic routes + permission store
+      try {
+        resetRouter()
+      } catch {
+        // ignore
+      }
+      import('@/stores/permission')
+        .then(({ usePermissionStore }) => {
+          try {
+            const permissionStore = usePermissionStore()
+            permissionStore.resetRoutes()
+          } catch {
+            // ignore
+          }
+        })
+        .catch(() => {})
     }
   }
 })

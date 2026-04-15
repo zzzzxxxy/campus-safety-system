@@ -42,7 +42,14 @@ service.interceptors.response.use(
   },
   (error) => {
     if (error.response?.status === 401) {
-      localStorage.removeItem('token')
+      try {
+        localStorage.removeItem('token')
+        localStorage.removeItem('roles')
+        localStorage.removeItem('permissions')
+        localStorage.removeItem('menus')
+      } catch {
+        // ignore
+      }
       router.push('/login')
       ElMessage.error('登录已过期，请重新登录')
     } else {
