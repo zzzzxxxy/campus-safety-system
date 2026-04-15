@@ -480,10 +480,10 @@
     }
   ],
   "statistics": {
-    "total": 52,
-    "passing": 4,
-    "failing": 48,
-    "completion_percentage": 7.7
+    "total": 59,
+    "passing": 12,
+    "failing": 47,
+    "completion_percentage": 20.3
   },
   "notes": "后端已基本完成, 前端需要从零开始搭建。优先级: 1(必须先做) > 2(核心功能) > 3(增强功能) > 4(锦上添花)"
 }
