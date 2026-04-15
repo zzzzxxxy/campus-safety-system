@@ -61,27 +61,53 @@
     </el-row>
 
     <el-row :gutter="16" class="mt-20">
+      <el-col :xs="24" :md="16">
+        <el-card shadow="hover">
+          <template #header>
+            <div class="card-header">
+              <span class="card-title">预警趋势（近7天）</span>
+              <el-tag size="small" type="info">来自 /report/dashboard</el-tag>
+            </div>
+          </template>
+          <v-chart class="chart" :option="warningTrendOption" autoresize />
+        </el-card>
+      </el-col>
+
+      <el-col :xs="24" :md="8">
+        <el-card shadow="hover">
+          <template #header>
+            <div class="card-header">
+              <span class="card-title">设备类型分布</span>
+              <el-tag size="small" type="info">来自 /report/device-stats</el-tag>
+            </div>
+          </template>
+          <v-chart class="chart" :option="devicePieOption" autoresize />
+        </el-card>
+      </el-col>
+    </el-row>
+
+    <el-row :gutter="16" class="mt-20">
       <el-col :xs="24" :md="12">
         <el-card shadow="hover">
           <template #header>
-            <span class="card-title">系统公告</span>
+            <div class="card-header">
+              <span class="card-title">最近预警（最新5条）</span>
+              <el-tag size="small" type="info">来自 /warning/record/page</el-tag>
+            </div>
           </template>
-          <div class="notice-list">
-            <div class="notice-item">
-              <el-tag size="small" type="danger">重要</el-tag>
-              <span class="notice-text">校园安全管理系统已上线运行</span>
-            </div>
-            <div class="notice-item">
-              <el-tag size="small" type="info">通知</el-tag>
-              <span class="notice-text">请各部门及时更新安全设备信息</span>
-            </div>
-            <div class="notice-item">
-              <el-tag size="small" type="warning">提醒</el-tag>
-              <span class="notice-text">本月安全检查即将开始</span>
-            </div>
-          </div>
+          <el-table :data="recentWarnings" size="small" style="width: 100%" v-loading="recentLoading">
+            <el-table-column prop="title" label="标题" min-width="160" show-overflow-tooltip />
+            <el-table-column prop="warningLevel" label="级别" width="80" />
+            <el-table-column prop="status" label="状态" width="80">
+              <template #default="scope">
+                <el-tag size="small" :type="statusTagType(scope.row.status)">{{ statusText(scope.row.status) }}</el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column prop="createTime" label="时间" width="160" />
+          </el-table>
         </el-card>
       </el-col>
+
       <el-col :xs="24" :md="12">
         <el-card shadow="hover">
           <template #header>
@@ -104,7 +130,8 @@ import { computed, onMounted, reactive, ref } from 'vue'
 import { ElMessage } from 'element-plus'
 import { Warning, User, Monitor, Document } from '@element-plus/icons-vue'
 
-import { getDashboard } from '@/api/report'
+import { getDashboard, getDeviceStats } from '@/api/report'
+import { getWarningRecordPage } from '@/api/warning'
 
 type TrendItem = { date: string; count: number }
 
@@ -117,6 +144,21 @@ type DashboardVO = {
   todayWarningCount?: number
   visitorTrend?: TrendItem[]
   warningTrend?: TrendItem[]
+}
+
+type DeviceTypeItem = { type: string; count: number }
+
+type DeviceStatsVO = {
+  typeDistribution?: DeviceTypeItem[]
+}
+
+type WarningRecord = {
+  id?: number
+  title?: string
+  warningType?: string | number
+  warningLevel?: string | number
+  status?: number
+  createTime?: string
 }
 
 const loading = ref(false)
@@ -140,6 +182,70 @@ const stats = computed(() => {
   }
 })
 
+const warningTrendOption = computed(() => {
+  const list = Array.isArray(dashboard.warningTrend) ? dashboard.warningTrend : []
+  return {
+    tooltip: { trigger: 'axis' },
+    grid: { left: 36, right: 16, top: 16, bottom: 28 },
+    xAxis: {
+      type: 'category',
+      boundaryGap: false,
+      data: list.map((i) => i.date)
+    },
+    yAxis: { type: 'value' },
+    series: [
+      {
+        name: '预警数',
+        type: 'line',
+        smooth: true,
+        data: list.map((i) => i.count),
+        areaStyle: { opacity: 0.08 }
+      }
+    ]
+  }
+})
+
+const deviceTypeDistribution = ref<DeviceTypeItem[]>([])
+const devicePieOption = computed(() => {
+  const list = deviceTypeDistribution.value || []
+  return {
+    tooltip: { trigger: 'item' },
+    legend: { bottom: 0, left: 'center' },
+    series: [
+      {
+        name: '设备类型',
+        type: 'pie',
+        radius: ['38%', '66%'],
+        avoidLabelOverlap: true,
+        itemStyle: { borderRadius: 6, borderColor: '#fff', borderWidth: 2 },
+        label: { show: false },
+        emphasis: { label: { show: true, fontSize: 14, fontWeight: 600 } },
+        labelLine: { show: false },
+        data: list.map((i) => ({ name: String(i.type), value: i.count }))
+      }
+    ]
+  }
+})
+
+const recentLoading = ref(false)
+const recentWarnings = ref<WarningRecord[]>([])
+
+function statusText(status?: number) {
+  if (status === 0) return '未处理'
+  if (status === 1) return '处理中'
+  if (status === 2) return '已处理'
+  if (status === 3) return '已关闭'
+  return '未知'
+}
+
+function statusTagType(status?: number) {
+  if (status === 0) return 'danger'
+  if (status === 1) return 'warning'
+  if (status === 2) return 'success'
+  if (status === 3) return 'info'
+  return 'info'
+}
+
 async function fetchDashboard() {
   loading.value = true
   try {
@@ -153,8 +259,34 @@ async function fetchDashboard() {
   }
 }
 
+async function fetchDeviceStats() {
+  try {
+    const res = await getDeviceStats()
+    const data = (res as any)?.data?.data as DeviceStatsVO
+    deviceTypeDistribution.value = (data?.typeDistribution || []) as any
+  } catch (e: any) {
+    ElMessage.error(e?.message || '获取设备统计失败')
+  }
+}
+
+async function fetchRecentWarnings() {
+  recentLoading.value = true
+  try {
+    const res = await getWarningRecordPage({ pageNum: 1, pageSize: 5 })
+    const payload = (res as any)?.data?.data
+    const records = payload?.records || payload?.list || []
+    recentWarnings.value = Array.isArray(records) ? records : []
+  } catch (e: any) {
+    ElMessage.error(e?.message || '获取最近预警失败')
+  } finally {
+    recentLoading.value = false
+  }
+}
+
 onMounted(() => {
   fetchDashboard()
+  fetchDeviceStats()
+  fetchRecentWarnings()
 })
 </script>
 
@@ -227,23 +359,16 @@ onMounted(() => {
   color: #303133;
 }
 
-.notice-list {
-  .notice-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px 0;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
 
-    &:last-child {
-      border-bottom: none;
-    }
-  }
-
-  .notice-text {
-    font-size: 14px;
-    color: #606266;
-  }
+.chart {
+  width: 100%;
+  height: 320px;
 }
 
 .quick-actions {
