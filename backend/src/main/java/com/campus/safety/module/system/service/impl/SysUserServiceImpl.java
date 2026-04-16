@@ -60,7 +60,26 @@ public class SysUserServiceImpl implements SysUserService {
 
         Page<SysUser> page = new Page<>(queryDTO.getPageNum(), queryDTO.getPageSize());
         Page<SysUser> result = sysUserMapper.selectPage(page, wrapper);
-        return PageResult.of(result.getTotal(), result.getRecords());
+
+        // 补齐 roleIds（用于前端“分配角色/编辑回显”）
+        List<SysUser> records = result.getRecords();
+        if (!CollectionUtils.isEmpty(records)) {
+            List<Long> userIds = records.stream().map(SysUser::getId).toList();
+
+            LambdaQueryWrapper<SysUserRole> urWrapper = new LambdaQueryWrapper<>();
+            urWrapper.in(SysUserRole::getUserId, userIds);
+            List<SysUserRole> userRoles = sysUserRoleMapper.selectList(urWrapper);
+
+            Map<Long, List<Long>> roleIdsMap = userRoles.stream()
+                    .collect(Collectors.groupingBy(SysUserRole::getUserId,
+                            Collectors.mapping(SysUserRole::getRoleId, Collectors.toList())));
+
+            for (SysUser u : records) {
+                u.setRoleIds(roleIdsMap.getOrDefault(u.getId(), Collections.emptyList()));
+            }
+        }
+
+        return PageResult.of(result.getTotal(), records);
     }
 
     @Override

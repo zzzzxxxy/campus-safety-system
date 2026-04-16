@@ -219,7 +219,7 @@
       "module": "frontend-system-user",
       "category": "frontend",
       "description": "用户管理: 分配角色功能 (选择角色对话框)",
-      "passes": false,
+      "passes": true,
       "priority": 2
     },
     {

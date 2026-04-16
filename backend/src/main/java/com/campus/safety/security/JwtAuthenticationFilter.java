@@ -2,6 +2,13 @@ package com.campus.safety.security;
 
 import com.campus.safety.common.constant.RedisConstants;
 import com.campus.safety.common.utils.JwtUtils;
+import com.campus.safety.module.system.mapper.SysMenuMapper;
+import com.campus.safety.module.system.mapper.SysRoleMenuMapper;
+import com.campus.safety.module.system.mapper.SysUserRoleMapper;
+import com.campus.safety.module.system.entity.SysMenu;
+import com.campus.safety.module.system.entity.SysRoleMenu;
+import com.campus.safety.module.system.entity.SysUserRole;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -20,6 +27,8 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.Set;
+import java.util.HashSet;
 
 /**
  * JWT认证过滤器
@@ -31,6 +40,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtUtils jwtUtils;
     private final RedisTemplate<String, Object> redisTemplate;
+
+    private final SysUserRoleMapper sysUserRoleMapper;
+    private final SysRoleMenuMapper sysRoleMenuMapper;
+    private final SysMenuMapper sysMenuMapper;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -56,10 +69,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String redisKey = RedisConstants.LOGIN_TOKEN_KEY + userId;
             Object cachedToken = redisTemplate.opsForValue().get(redisKey);
 
-            // 获取用户权限（优先走缓存；没有缓存会返回空权限）
+            // 获取用户权限（优先走缓存；缓存缺失则回源DB，确保“纯JWT无Redis”模式也可用）
             List<SimpleGrantedAuthority> authorities = getAuthorities(userId);
 
-            // 允许纯JWT无状态认证（即使Redis里没有缓存token）
             UsernamePasswordAuthenticationToken authentication =
                     new UsernamePasswordAuthenticationToken(username, null, authorities);
             SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -83,13 +95,65 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
      */
     @SuppressWarnings("unchecked")
     private List<SimpleGrantedAuthority> getAuthorities(Long userId) {
-        String permKey = RedisConstants.USER_PERMISSION_KEY + userId;
-        List<String> permissions = (List<String>) redisTemplate.opsForValue().get(permKey);
-        if (permissions != null) {
-            return permissions.stream()
-                    .map(SimpleGrantedAuthority::new)
-                    .collect(Collectors.toList());
+        // 说明：当前项目 RedisTemplate 的 value serializer 可能启用了 Jackson 多态（WRAPPER_ARRAY），
+        // 若 Redis 中历史数据是“纯数组 JSON”（例如 ["system:role:list", ...]），反序列化会把第一个元素当作 typeId 导致 InvalidTypeIdException。
+        // 为避免出现“接口偶发 401/500”，这里对 Redis 读取做强兜底：读失败或不存在均回源 DB。
+        List<String> permissions = null;
+        try {
+            String permKey = RedisConstants.USER_PERMISSION_KEY + userId;
+            permissions = (List<String>) redisTemplate.opsForValue().get(permKey);
+        } catch (Exception ignore) {
+            permissions = null;
         }
-        return Collections.emptyList();
+
+        if (permissions == null) {
+            try {
+                permissions = List.copyOf(loadPermissionsFromDb(userId));
+            } catch (Exception e) {
+                permissions = Collections.emptyList();
+            }
+        }
+
+        return permissions.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList());
+    }
+
+    /**
+     * 从DB回源查询权限（等价于 SysUserServiceImpl#getPermissionsByUserId，但避免注入 Service 形成循环依赖）
+     */
+    private Set<String> loadPermissionsFromDb(Long userId) {
+        // 1) user -> roleIds
+        LambdaQueryWrapper<SysUserRole> urWrapper = new LambdaQueryWrapper<>();
+        urWrapper.eq(SysUserRole::getUserId, userId);
+        List<SysUserRole> userRoles = sysUserRoleMapper.selectList(urWrapper);
+        if (userRoles == null || userRoles.isEmpty()) {
+            return Collections.emptySet();
+        }
+        List<Long> roleIds = userRoles.stream().map(SysUserRole::getRoleId).distinct().collect(Collectors.toList());
+
+        // 2) roleIds -> menuIds
+        LambdaQueryWrapper<SysRoleMenu> rmWrapper = new LambdaQueryWrapper<>();
+        rmWrapper.in(SysRoleMenu::getRoleId, roleIds);
+        List<SysRoleMenu> roleMenus = sysRoleMenuMapper.selectList(rmWrapper);
+        if (roleMenus == null || roleMenus.isEmpty()) {
+            return Collections.emptySet();
+        }
+        List<Long> menuIds = roleMenus.stream().map(SysRoleMenu::getMenuId).distinct().collect(Collectors.toList());
+
+        // 3) menuIds -> perms
+        LambdaQueryWrapper<SysMenu> menuWrapper = new LambdaQueryWrapper<>();
+        menuWrapper.in(SysMenu::getId, menuIds);
+        List<SysMenu> menus = sysMenuMapper.selectList(menuWrapper);
+        if (menus == null || menus.isEmpty()) {
+            return Collections.emptySet();
+        }
+
+        Set<String> perms = new HashSet<>();
+        for (SysMenu m : menus) {
+            if (m != null && StringUtils.hasText(m.getPerms())) {
+                perms.add(m.getPerms());
+            }
+        }
+        return perms;
     }
 }
+

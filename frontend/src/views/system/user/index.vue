@@ -67,9 +67,10 @@
           </template>
         </el-table-column>
         <el-table-column prop="createTime" label="创建时间" min-width="170" />
-        <el-table-column label="操作" width="220" fixed="right">
+        <el-table-column label="操作" width="280" fixed="right">
           <template #default="{ row }">
             <el-button type="primary" link @click="openEdit(row)">编辑</el-button>
+            <el-button type="success" link @click="openAssignRoles(row)">分配角色</el-button>
             <el-button type="warning" link @click="openResetPwd(row)">重置密码</el-button>
             <el-button type="danger" link @click="handleDelete(row)">删除</el-button>
           </template>
@@ -160,6 +161,34 @@
       <template #footer>
         <el-button @click="dialogVisible = false">取消</el-button>
         <el-button type="primary" :loading="submitLoading" @click="handleSubmit">保存</el-button>
+      </template>
+    </el-dialog>
+
+    <el-dialog v-model="assignRoleVisible" title="分配角色" width="640px" destroy-on-close>
+      <el-form label-width="100px">
+        <el-form-item label="用户">
+          <el-input :value="assignRoleForm.username" disabled />
+        </el-form-item>
+        <el-form-item label="角色">
+          <el-select
+            v-model="assignRoleForm.roleIds"
+            multiple
+            filterable
+            collapse-tags
+            collapse-tags-tooltip
+            clearable
+            placeholder="请选择角色"
+            style="width: 100%"
+            :loading="assignRoleLoading"
+          >
+            <el-option v-for="r in roleOptions" :key="r.id" :label="r.roleName" :value="r.id" />
+          </el-select>
+        </el-form-item>
+      </el-form>
+
+      <template #footer>
+        <el-button @click="assignRoleVisible = false">取消</el-button>
+        <el-button type="primary" :loading="assignRoleLoading" @click="handleAssignRoles">保存</el-button>
       </template>
     </el-dialog>
 
@@ -299,6 +328,30 @@ const rules = reactive<FormRules>({
   ],
   userType: [{ required: true, message: '请选择用户类型', trigger: 'change' }],
   status: [{ required: true, message: '请选择状态', trigger: 'change' }]
+})
+
+const assignRoleVisible = ref(false)
+const assignRoleLoading = ref(false)
+const assignRoleForm = reactive<{
+  id: number | null
+  username: string
+  nickname: string
+  phone: string
+  email: string
+  avatar: string
+  userType: number
+  status: number
+  roleIds: number[]
+}>({
+  id: null,
+  username: '',
+  nickname: '',
+  phone: '',
+  email: '',
+  avatar: '',
+  userType: 0,
+  status: 0,
+  roleIds: []
 })
 
 const resetPwdVisible = ref(false)
@@ -519,6 +572,48 @@ function openResetPwd(row: SysUser) {
   })
 }
 
+function openAssignRoles(row: SysUser) {
+  assignRoleVisible.value = true
+  assignRoleForm.id = row.id
+  assignRoleForm.username = row.username
+  assignRoleForm.nickname = row.nickname || ''
+  assignRoleForm.phone = row.phone || ''
+  assignRoleForm.email = row.email || ''
+  assignRoleForm.avatar = row.avatar || ''
+  assignRoleForm.userType = Number(row.userType ?? 0)
+  assignRoleForm.status = Number(row.status ?? 0)
+  assignRoleForm.roleIds = Array.isArray(row.roleIds) ? (row.roleIds as number[]).map((v) => Number(v)) : []
+
+  // 角色列表可能发生变化，打开时刷新一次，保证回显可用
+  fetchRoleOptions()
+}
+
+async function handleAssignRoles() {
+  if (!assignRoleForm.id) return
+
+  assignRoleLoading.value = true
+  try {
+    await updateUser({
+      id: assignRoleForm.id,
+      // 复用 updateUser：必须带上必要字段，避免后端 BeanUtils.copyProperties 覆盖为空
+      username: assignRoleForm.username,
+      nickname: assignRoleForm.nickname,
+      phone: assignRoleForm.phone,
+      email: assignRoleForm.email,
+      avatar: assignRoleForm.avatar,
+      userType: assignRoleForm.userType,
+      status: assignRoleForm.status,
+      roleIds: (assignRoleForm.roleIds || []).map((v) => Number(v))
+    })
+
+    ElMessage.success('角色已更新')
+    assignRoleVisible.value = false
+    await fetchList()
+  } finally {
+    assignRoleLoading.value = false
+  }
+}
+
 async function handleResetPassword() {
   await resetPwdRef.value?.validate(async (valid) => {
     if (!valid) return
@@ -526,7 +621,6 @@ async function handleResetPassword() {
 
     resetPwdLoading.value = true
     try {
-      // NOTE: api.resetPassword will be patched separately to match backend requestParam newPassword
       await resetPassword(resetPwdForm.id, resetPwdForm.newPassword)
       ElMessage.success('重置成功')
       resetPwdVisible.value = false
