@@ -31,3 +31,7 @@ export function checkOutVisitor(id: number) {
 export function getTodayStats() {
   return request.get('/visitor/today-stats')
 }
+
+export function exportVisitor(params: any) {
+  return request.get('/visitor/export', { params, responseType: 'blob' })
+}

@@ -13,6 +13,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -93,7 +100,7 @@ public class VisitorRecordController {
      * 入校签到
      */
     @PutMapping("/check-in/{id}")
-    @PreAuthorize("hasAuthority('visitor:checkin')")
+    @PreAuthorize("hasAuthority('visitor:record:audit')")
     @Log(module = "访客管理", description = "访客入校签到")
     public R<Void> checkIn(@PathVariable Long id) {
         visitorRecordService.checkIn(id);
@@ -104,7 +111,7 @@ public class VisitorRecordController {
      * 离校签退
      */
     @PutMapping("/check-out/{id}")
-    @PreAuthorize("hasAuthority('visitor:checkout')")
+    @PreAuthorize("hasAuthority('visitor:record:audit')")
     @Log(module = "访客管理", description = "访客离校签退")
     public R<Void> checkOut(@PathVariable Long id) {
         visitorRecordService.checkOut(id);
@@ -120,4 +127,86 @@ public class VisitorRecordController {
     public R<Map<String, Object>> todayStats() {
         return R.ok(visitorRecordService.todayStats());
     }
+
+    /**
+     * 导出访客记录（CSV）
+     */
+    @GetMapping("/export")
+    @PreAuthorize("hasAuthority('visitor:record:list')")
+    @Log(module = "访客管理", description = "导出访客记录")
+    public void export(VisitorQueryDTO queryDTO, HttpServletResponse response) throws IOException {
+        List<VisitorRecord> list = visitorRecordService.exportList(queryDTO);
+
+        String filename = "visitor_records.csv";
+        String encoded = URLEncoder.encode(filename, StandardCharsets.UTF_8).replaceAll("\\+", "%20");
+
+        response.setCharacterEncoding(StandardCharsets.UTF_8.name());
+        response.setContentType("text/csv; charset=UTF-8");
+        response.setHeader("Content-Disposition", "attachment; filename*=UTF-8''" + encoded);
+
+        // Write UTF-8 BOM for Excel compatibility
+        PrintWriter writer = response.getWriter();
+        writer.write('\ufeff');
+
+        // header
+        writer.println("ID,访客姓名,手机号,身份证,事由,被访人,部门,预计到访,预计离开,实际到访,实际离开,状态,备注");
+
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        for (VisitorRecord r : list) {
+            writer.print(csv(r.getId()));
+            writer.print(',');
+            writer.print(csv(r.getVisitorName()));
+            writer.print(',');
+            writer.print(csv(r.getVisitorPhone()));
+            writer.print(',');
+            writer.print(csv(r.getIdCard()));
+            writer.print(',');
+            writer.print(csv(r.getReason()));
+            writer.print(',');
+            writer.print(csv(r.getVisitee()));
+            writer.print(',');
+            writer.print(csv(r.getDepartment()));
+            writer.print(',');
+            writer.print(csv(formatDt(r.getVisitTime(), dtf)));
+            writer.print(',');
+            writer.print(csv(formatDt(r.getLeaveTime(), dtf)));
+            writer.print(',');
+            writer.print(csv(formatDt(r.getActualVisitTime(), dtf)));
+            writer.print(',');
+            writer.print(csv(formatDt(r.getActualLeaveTime(), dtf)));
+            writer.print(',');
+            writer.print(csv(statusLabel(r.getStatus())));
+            writer.print(',');
+            writer.print(csv(r.getRemark()));
+            writer.println();
+        }
+        writer.flush();
+    }
+
+    private static String formatDt(java.time.LocalDateTime dt, DateTimeFormatter dtf) {
+        return dt == null ? "" : dt.format(dtf);
+    }
+
+    private static String statusLabel(Integer status) {
+        if (status == null) return "";
+        if (status == 0) return "待审批";
+        if (status == 1) return "已通过";
+        if (status == 2) return "已拒绝";
+        return String.valueOf(status);
+    }
+
+    /**
+     * Minimal CSV escaping: wrap with quotes if contains comma/quote/newline.
+     */
+    private static String csv(Object v) {
+        if (v == null) return "";
+        String s = String.valueOf(v);
+        boolean needQuote = s.contains(",") || s.contains("\"") || s.contains("\n") || s.contains("\r");
+        if (needQuote) {
+            s = s.replace("\"", "\"\"");
+            return "\"" + s + "\"";
+        }
+        return s;
+    }
 }
+

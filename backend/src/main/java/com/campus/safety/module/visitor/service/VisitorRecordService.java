@@ -6,6 +6,7 @@ import com.campus.safety.module.visitor.dto.VisitorDTO;
 import com.campus.safety.module.visitor.dto.VisitorQueryDTO;
 import com.campus.safety.module.visitor.entity.VisitorRecord;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -57,4 +58,9 @@ public interface VisitorRecordService {
      * 今日访客统计
      */
     Map<String, Object> todayStats();
+
+    /**
+     * 导出访客记录（按筛选条件）
+     */
+    List<VisitorRecord> exportList(VisitorQueryDTO queryDTO);
 }

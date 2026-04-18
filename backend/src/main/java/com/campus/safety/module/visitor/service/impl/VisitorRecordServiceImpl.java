@@ -19,6 +19,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -68,7 +69,15 @@ public class VisitorRecordServiceImpl implements VisitorRecordService {
         record.setReason(dto.getVisitReason());
         record.setDepartment(dto.getVisitDepartment());
         record.setVisitee(dto.getVisitPerson());
+        record.setVisitTime(dto.getVisitTime());
+        record.setLeaveTime(dto.getLeaveTime());
         record.setStatus(0); // 默认待审批
+
+        if (record.getLeaveTime() != null && record.getVisitTime() != null
+                && record.getLeaveTime().isBefore(record.getVisitTime())) {
+            throw new BusinessException("预计离开时间不能早于预计到访时间");
+        }
+
         visitorRecordMapper.insert(record);
     }
 
@@ -87,6 +96,14 @@ public class VisitorRecordServiceImpl implements VisitorRecordService {
         existing.setReason(dto.getVisitReason());
         existing.setDepartment(dto.getVisitDepartment());
         existing.setVisitee(dto.getVisitPerson());
+        existing.setVisitTime(dto.getVisitTime());
+        existing.setLeaveTime(dto.getLeaveTime());
+
+        if (existing.getLeaveTime() != null && existing.getVisitTime() != null
+                && existing.getLeaveTime().isBefore(existing.getVisitTime())) {
+            throw new BusinessException("预计离开时间不能早于预计到访时间");
+        }
+
         visitorRecordMapper.updateById(existing);
     }
 
@@ -188,4 +205,22 @@ public class VisitorRecordServiceImpl implements VisitorRecordService {
         stats.put("checkedIn", checkedIn);
         return stats;
     }
+
+    @Override
+    public List<VisitorRecord> exportList(VisitorQueryDTO queryDTO) {
+        LambdaQueryWrapper<VisitorRecord> wrapper = new LambdaQueryWrapper<>();
+        wrapper.like(StringUtils.hasText(queryDTO.getVisitorName()),
+                VisitorRecord::getVisitorName, queryDTO.getVisitorName());
+        wrapper.eq(StringUtils.hasText(queryDTO.getPhone()),
+                VisitorRecord::getVisitorPhone, queryDTO.getPhone());
+        wrapper.eq(queryDTO.getStatus() != null,
+                VisitorRecord::getStatus, queryDTO.getStatus());
+        wrapper.ge(queryDTO.getStartTime() != null,
+                VisitorRecord::getVisitTime, queryDTO.getStartTime());
+        wrapper.le(queryDTO.getEndTime() != null,
+                VisitorRecord::getVisitTime, queryDTO.getEndTime());
+        wrapper.orderByDesc(VisitorRecord::getCreateTime);
+        return visitorRecordMapper.selectList(wrapper);
+    }
 }
+
