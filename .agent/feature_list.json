@@ -227,7 +227,7 @@
       "module": "frontend-system-role",
       "category": "frontend",
       "description": "角色管理页面: 角色列表(分页/搜索), 新增/编辑/删除角色",
-      "passes": false,
+      "passes": true,
       "priority": 2
     },
     {
@@ -235,7 +235,7 @@
       "module": "frontend-system-role",
       "category": "frontend",
       "description": "角色管理: 分配菜单权限 (Tree组件选择菜单)",
-      "passes": false,
+      "passes": true,
       "priority": 2
     },
     {
@@ -243,7 +243,7 @@
       "module": "frontend-system-menu",
       "category": "frontend",
       "description": "菜单管理页面: 树形表格展示, 新增/编辑/删除菜单, 菜单类型(目录/菜单/按钮)",
-      "passes": false,
+      "passes": true,
       "priority": 2
     },
     {
@@ -481,9 +481,9 @@
   ],
   "statistics": {
     "total": 59,
-    "passing": 26,
-    "failing": 33,
-    "completion_percentage": 44.1
+    "passing": 30,
+    "failing": 29,
+    "completion_percentage": 50.8
   },
   "notes": "后端已基本完成, 前端需要从零开始搭建。优先级: 1(必须先做) > 2(核心功能) > 3(增强功能) > 4(锦上添花)"
 }
