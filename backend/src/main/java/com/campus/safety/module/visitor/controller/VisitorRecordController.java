@@ -29,7 +29,7 @@ public class VisitorRecordController {
      * 分页查询访客记录
      */
     @GetMapping("/page")
-    @PreAuthorize("hasAuthority('visitor:list')")
+    @PreAuthorize("hasAuthority('visitor:record:list')")
     @Log(module = "访客管理", description = "分页查询访客记录")
     public R<PageResult<VisitorRecord>> page(VisitorQueryDTO queryDTO) {
         return R.ok(visitorRecordService.queryPage(queryDTO));
@@ -39,7 +39,7 @@ public class VisitorRecordController {
      * 获取访客记录详情
      */
     @GetMapping("/{id}")
-    @PreAuthorize("hasAuthority('visitor:list')")
+    @PreAuthorize("hasAuthority('visitor:record:list')")
     @Log(module = "访客管理", description = "查询访客详情")
     public R<VisitorRecord> getById(@PathVariable Long id) {
         return R.ok(visitorRecordService.getById(id));
@@ -49,7 +49,7 @@ public class VisitorRecordController {
      * 新增访客记录
      */
     @PostMapping
-    @PreAuthorize("hasAuthority('visitor:add')")
+    @PreAuthorize("hasAuthority('visitor:record:add')")
     @Log(module = "访客管理", description = "新增访客记录")
     public R<Void> add(@RequestBody @Valid VisitorDTO dto) {
         visitorRecordService.add(dto);
@@ -60,7 +60,7 @@ public class VisitorRecordController {
      * 编辑访客记录
      */
     @PutMapping
-    @PreAuthorize("hasAuthority('visitor:edit')")
+    @PreAuthorize("hasAuthority('visitor:record:edit')")
     @Log(module = "访客管理", description = "编辑访客记录")
     public R<Void> update(@RequestBody @Valid VisitorDTO dto) {
         visitorRecordService.update(dto);
@@ -71,7 +71,7 @@ public class VisitorRecordController {
      * 删除访客记录
      */
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('visitor:delete')")
+    @PreAuthorize("hasAuthority('visitor:record:delete')")
     @Log(module = "访客管理", description = "删除访客记录")
     public R<Void> delete(@PathVariable Long id) {
         visitorRecordService.delete(id);
@@ -82,7 +82,7 @@ public class VisitorRecordController {
      * 审核访客
      */
     @PutMapping("/audit")
-    @PreAuthorize("hasAuthority('visitor:audit')")
+    @PreAuthorize("hasAuthority('visitor:record:audit')")
     @Log(module = "访客管理", description = "审核访客记录")
     public R<Void> audit(@RequestBody @Valid VisitorAuditDTO dto) {
         visitorRecordService.audit(dto);
@@ -115,7 +115,7 @@ public class VisitorRecordController {
      * 今日访客统计
      */
     @GetMapping("/today-stats")
-    @PreAuthorize("hasAuthority('visitor:list')")
+    @PreAuthorize("hasAuthority('visitor:record:list')")
     @Log(module = "访客管理", description = "查看今日访客统计")
     public R<Map<String, Object>> todayStats() {
         return R.ok(visitorRecordService.todayStats());
