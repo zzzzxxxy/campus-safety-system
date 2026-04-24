@@ -130,7 +130,16 @@ router.beforeEach(async (to, _from, next) => {
 
           // Use replace to navigate to ensure the route is found
           next({ ...to, replace: true })
-        } catch (error) {
+        } catch (error: any) {
+          // If /auth/info returns unauthorized, token is invalid/expired: clear it and go login.
+          // Do not keep rendering with cached menus, otherwise the page may show stale auth state.
+          const message = String(error?.message || '')
+          if (message.includes('未登录') || message.includes('token') || message.includes('登录已过期')) {
+            userStore.resetToken()
+            next(`/login?redirect=${encodeURIComponent(to.fullPath)}`)
+            return
+          }
+
           // If refresh happens while backend is temporarily unavailable, try using cached menus
           const cachedMenus = loadPersistedMenus()
           if (cachedMenus.length) {

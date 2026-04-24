@@ -54,17 +54,17 @@ public class SecurityConfig {
                     .anyRequest().authenticated()
             )
             .exceptionHandling(exception -> exception
-                    // 未认证
+                    // 未认证：返回标准 HTTP 401，避免前端把 200 响应当作普通业务失败弹窗处理。
                     .authenticationEntryPoint((request, response, authException) -> {
                         response.setContentType("application/json;charset=UTF-8");
-                        response.setStatus(HttpServletResponse.SC_OK);
+                        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                         response.getWriter().write(objectMapper.writeValueAsString(
                                 R.fail(ResultCode.UNAUTHORIZED)));
                     })
-                    // 权限不足
+                    // 权限不足：返回标准 HTTP 403，交由前端统一跳转 403 页面。
                     .accessDeniedHandler((request, response, accessDeniedException) -> {
                         response.setContentType("application/json;charset=UTF-8");
-                        response.setStatus(HttpServletResponse.SC_OK);
+                        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                         response.getWriter().write(objectMapper.writeValueAsString(
                                 R.fail(ResultCode.FORBIDDEN)));
                     })
