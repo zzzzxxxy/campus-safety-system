@@ -17,7 +17,7 @@ export function deleteWarningRecord(id: number) {
   return request.delete(`/warning/record/${id}`)
 }
 
-export function handleWarningRecord(data: { id: number; handleResult: string; handleRemark?: string }) {
+export function handleWarningRecord(data: { id: number; status: number; handleResult?: string }) {
   return request.put('/warning/record/handle', data)
 }
 
