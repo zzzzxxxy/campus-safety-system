@@ -32,6 +32,10 @@
             show-password
           />
         </el-form-item>
+        <div class="login-options">
+          <el-checkbox v-model="rememberPassword">记住密码</el-checkbox>
+          <span class="campus-theme-tip">平安校园 · 智慧守护</span>
+        </div>
         <el-form-item>
           <el-button
             type="primary"
@@ -51,7 +55,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
+import { onMounted, ref, reactive } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { User, Lock, School } from '@element-plus/icons-vue'
@@ -64,6 +68,9 @@ const userStore = useUserStore()
 
 const loginFormRef = ref<FormInstance>()
 const loading = ref(false)
+
+const rememberPassword = ref(false)
+const REMEMBER_KEY = 'campus_safety_remember_login'
 
 const loginForm = reactive({
   username: '',
@@ -91,6 +98,15 @@ const doLogin = async () => {
   try {
     await userStore.login({ username: loginForm.username, password: loginForm.password })
 
+    if (rememberPassword.value) {
+      localStorage.setItem(REMEMBER_KEY, JSON.stringify({
+        username: loginForm.username,
+        password: btoa(encodeURIComponent(loginForm.password))
+      }))
+    } else {
+      localStorage.removeItem(REMEMBER_KEY)
+    }
+
     // Preload user info (roles/menus) to avoid router guard immediately resetting token
     // when /auth/info fails.
     await userStore.getInfo()
@@ -104,6 +120,19 @@ const doLogin = async () => {
     loading.value = false
   }
 }
+
+onMounted(() => {
+  try {
+    const raw = localStorage.getItem(REMEMBER_KEY)
+    if (!raw) return
+    const saved = JSON.parse(raw)
+    loginForm.username = saved?.username || ''
+    loginForm.password = saved?.password ? decodeURIComponent(atob(saved.password)) : ''
+    rememberPassword.value = Boolean(loginForm.username && loginForm.password)
+  } catch {
+    localStorage.removeItem(REMEMBER_KEY)
+  }
+})
 
 const handleLogin = async () => {
   // Element Plus Form ref may not be available in some build/auto-import setups.
@@ -131,16 +160,47 @@ const handleLogin = async () => {
   justify-content: center;
   width: 100%;
   height: 100vh;
-  background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%);
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 15% 20%, rgba(64, 158, 255, 0.24), transparent 28%),
+    radial-gradient(circle at 82% 18%, rgba(103, 194, 58, 0.18), transparent 26%),
+    linear-gradient(135deg, #eef6ff 0%, #f7fbf4 48%, #edf2f7 100%);
+
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.48);
+    filter: blur(1px);
+  }
+
+  &::before {
+    width: 360px;
+    height: 360px;
+    left: -120px;
+    bottom: -110px;
+  }
+
+  &::after {
+    width: 260px;
+    height: 260px;
+    right: -90px;
+    top: -80px;
+  }
 }
 
 .login-card {
   width: 420px;
   padding: 40px 36px 30px;
-  background: #fff;
+  position: relative;
+  z-index: 1;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(10px);
   border-radius: 8px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-  border: 1px solid rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(64, 158, 255, 0.12);
 }
 
 .login-header {
@@ -171,6 +231,18 @@ const handleLogin = async () => {
   .el-form-item {
     margin-bottom: 22px;
   }
+}
+
+.login-options {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: -4px 0 18px;
+  font-size: 13px;
+}
+
+.campus-theme-tip {
+  color: #67c23a;
 }
 
 .login-button {

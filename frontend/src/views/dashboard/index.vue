@@ -61,7 +61,7 @@
     </el-row>
 
     <el-row :gutter="16" class="mt-20">
-      <el-col :xs="24" :md="16">
+      <el-col :xs="24" :md="12">
         <el-card shadow="hover">
           <template #header>
             <div class="card-header">
@@ -73,6 +73,20 @@
         </el-card>
       </el-col>
 
+      <el-col :xs="24" :md="12">
+        <el-card shadow="hover">
+          <template #header>
+            <div class="card-header">
+              <span class="card-title">访客统计（本月每日）</span>
+              <el-tag size="small" type="success">来自 /report/visitor-stats</el-tag>
+            </div>
+          </template>
+          <v-chart class="chart" :option="visitorBarOption" autoresize />
+        </el-card>
+      </el-col>
+    </el-row>
+
+    <el-row :gutter="16" class="mt-20">
       <el-col :xs="24" :md="8">
         <el-card shadow="hover">
           <template #header>
@@ -82,6 +96,19 @@
             </div>
           </template>
           <v-chart class="chart" :option="devicePieOption" autoresize />
+        </el-card>
+      </el-col>
+      <el-col :xs="24" :md="16">
+        <el-card shadow="hover">
+          <template #header>
+            <span class="card-title">快捷操作</span>
+          </template>
+          <div class="quick-actions">
+            <el-button type="primary" plain :icon="Warning">预警管理</el-button>
+            <el-button type="success" plain :icon="User">访客登记</el-button>
+            <el-button type="warning" plain :icon="Monitor">资产巡检</el-button>
+            <el-button type="danger" plain :icon="Document">生成报告</el-button>
+          </div>
         </el-card>
       </el-col>
     </el-row>
@@ -111,20 +138,6 @@
           </el-table>
         </el-card>
       </el-col>
-
-      <el-col :xs="24" :md="12">
-        <el-card shadow="hover">
-          <template #header>
-            <span class="card-title">快捷操作</span>
-          </template>
-          <div class="quick-actions">
-            <el-button type="primary" plain :icon="Warning">预警管理</el-button>
-            <el-button type="success" plain :icon="User">访客登记</el-button>
-            <el-button type="warning" plain :icon="Monitor">资产巡检</el-button>
-            <el-button type="danger" plain :icon="Document">生成报告</el-button>
-          </div>
-        </el-card>
-      </el-col>
     </el-row>
   </div>
 </template>
@@ -134,7 +147,7 @@ import { computed, onMounted, reactive, ref } from 'vue'
 import { ElMessage } from 'element-plus'
 import { Warning, User, Monitor, Document } from '@element-plus/icons-vue'
 
-import { getDashboard, getDeviceStats } from '@/api/report'
+import { getDashboard, getDeviceStats, getVisitorStats } from '@/api/report'
 import { getWarningRecordPage } from '@/api/warning'
 import { dictLabel, dictTagType, warningLevelOptions, warningRecordStatusOptions } from '@/utils/dict'
 
@@ -155,6 +168,10 @@ type DeviceTypeItem = { type: string; count: number }
 
 type DeviceStatsVO = {
   typeDistribution?: DeviceTypeItem[]
+}
+
+type VisitorStatsVO = {
+  dailyStats?: TrendItem[]
 }
 
 type WarningRecord = {
@@ -205,6 +222,32 @@ const warningTrendOption = computed(() => {
         smooth: true,
         data: list.map((i) => i.count),
         areaStyle: { opacity: 0.08 }
+      }
+    ]
+  }
+})
+
+const visitorDailyStats = ref<TrendItem[]>([])
+const visitorBarOption = computed(() => {
+  const list = visitorDailyStats.value || []
+  return {
+    tooltip: { trigger: 'axis' },
+    grid: { left: 36, right: 16, top: 16, bottom: 28 },
+    xAxis: {
+      type: 'category',
+      data: list.map((i) => i.date.slice(5))
+    },
+    yAxis: { type: 'value', minInterval: 1 },
+    series: [
+      {
+        name: '访客量',
+        type: 'bar',
+        barMaxWidth: 28,
+        data: list.map((i) => i.count),
+        itemStyle: {
+          borderRadius: [6, 6, 0, 0],
+          color: '#67c23a'
+        }
       }
     ]
   }
@@ -264,6 +307,24 @@ async function fetchDashboard() {
   }
 }
 
+function currentMonthRange() {
+  const now = new Date()
+  const start = new Date(now.getFullYear(), now.getMonth(), 1)
+  const end = new Date(now.getFullYear(), now.getMonth() + 1, 0)
+  const format = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+  return { startDate: format(start), endDate: format(end) }
+}
+
+async function fetchVisitorStats() {
+  try {
+    const res = await getVisitorStats(currentMonthRange())
+    const data = (res as any)?.data?.data as VisitorStatsVO
+    visitorDailyStats.value = (data?.dailyStats || []) as any
+  } catch (e: any) {
+    ElMessage.error(e?.message || '获取访客统计失败')
+  }
+}
+
 async function fetchDeviceStats() {
   try {
     const res = await getDeviceStats()
@@ -290,6 +351,7 @@ async function fetchRecentWarnings() {
 
 onMounted(() => {
   fetchDashboard()
+  fetchVisitorStats()
   fetchDeviceStats()
   fetchRecentWarnings()
 })

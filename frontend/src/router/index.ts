@@ -9,6 +9,12 @@ export const constantRoutes: RouteRecordRaw[] = [
     meta: { title: '登录', hidden: true }
   },
   {
+    path: '/redirect/:path(.*)',
+    name: 'Redirect',
+    component: () => import('@/views/redirect/index.vue'),
+    meta: { title: '刷新', hidden: true }
+  },
+  {
     path: '/403',
     name: 'Forbidden',
     component: () => import('@/views/403.vue'),

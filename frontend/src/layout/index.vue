@@ -5,6 +5,7 @@
     </div>
     <div class="main-wrapper">
       <Header v-model:collapse="isCollapsed" />
+      <TagsView />
       <div class="main-content">
         <router-view v-slot="{ Component }">
           <transition name="fade" mode="out-in">
@@ -20,6 +21,7 @@
 import { ref } from 'vue'
 import Sidebar from './components/Sidebar.vue'
 import Header from './components/Header.vue'
+import TagsView from './components/TagsView.vue'
 
 const isCollapsed = ref(false)
 </script>

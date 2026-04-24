@@ -107,7 +107,7 @@
       "module": "frontend-login",
       "category": "frontend",
       "description": "登录页面: 记住密码功能 (localStorage), 校园主题视觉设计",
-      "passes": false,
+      "passes": true,
       "priority": 3
     },
     {
@@ -147,7 +147,7 @@
       "module": "frontend-layout",
       "category": "frontend",
       "description": "标签页导航: 多标签页切换, 右键菜单(关闭当前/关闭其他/关闭全部)",
-      "passes": false,
+      "passes": true,
       "priority": 3
     },
     {
@@ -187,7 +187,7 @@
       "module": "frontend-dashboard",
       "category": "frontend",
       "description": "仪表盘: 访客统计柱状图 (本月每日访客量)",
-      "passes": false,
+      "passes": true,
       "priority": 3
     },
     {
@@ -481,10 +481,10 @@
   ],
   "statistics": {
     "total": 59,
-    "passing": 46,
-    "failing": 13,
-    "completion_percentage": 78.0,
-    "completion_percent": 77.97
+    "passing": 52,
+    "failing": 7,
+    "completion_percentage": 88.1,
+    "completion_percent": 88.14
   },
   "notes": "后端已基本完成, 前端需要从零开始搭建。优先级: 1(必须先做) > 2(核心功能) > 3(增强功能) > 4(锦上添花)"
 }
