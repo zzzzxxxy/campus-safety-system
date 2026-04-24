@@ -83,7 +83,8 @@
 
     <!-- 详情 -->
     <el-dialog v-model="detailVisible" title="预警详情" width="760px" destroy-on-close>
-      <el-descriptions v-if="detail" :column="2" border>
+      <div v-loading="detailLoading">
+        <el-descriptions v-if="detail" :column="2" border>
         <el-descriptions-item label="标题">{{ detail.title }}</el-descriptions-item>
         <el-descriptions-item label="类型">{{ detail.warningType }}</el-descriptions-item>
         <el-descriptions-item label="危险级别">
@@ -99,7 +100,9 @@
         <el-descriptions-item label="内容" :span="2">{{ detail.content || '-' }}</el-descriptions-item>
         <el-descriptions-item label="处理结果" :span="2">{{ detail.handleResult || '-' }}</el-descriptions-item>
         <el-descriptions-item label="备注" :span="2">{{ detail.remark || '-' }}</el-descriptions-item>
-      </el-descriptions>
+        </el-descriptions>
+        <el-empty v-else description="暂无详情" />
+      </div>
       <template #footer>
         <el-button @click="detailVisible = false">关闭</el-button>
       </template>
@@ -244,6 +247,8 @@ async function fetchList() {
     const data = res.data.data
     tableData.value = data.records || []
     total.value = Number(data.total || 0)
+  } catch {
+    ElMessage.error('加载预警记录失败')
   } finally {
     loading.value = false
   }
@@ -251,13 +256,21 @@ async function fetchList() {
 
 // ========== 详情 ==========
 const detailVisible = ref(false)
+const detailLoading = ref(false)
 const detail = ref<WarningRecordRow | null>(null)
 
 async function openDetail(row: WarningRecordRow) {
   detailVisible.value = true
   detail.value = null
-  const res: any = await request.get(`/warning/record/${row.id}`)
-  detail.value = res?.data || null
+  detailLoading.value = true
+  try {
+    const res: any = await request.get(`/warning/record/${row.id}`)
+    detail.value = res?.data?.data || res?.data || null
+  } catch {
+    ElMessage.error('获取预警详情失败')
+  } finally {
+    detailLoading.value = false
+  }
 }
 
 // ========== 处理（F122） ==========
@@ -297,6 +310,8 @@ async function submitHandle() {
     ElMessage.success('处理成功')
     handleVisible.value = false
     fetchList()
+  } catch {
+    ElMessage.error('处理预警失败')
   } finally {
     handleLoading.value = false
   }

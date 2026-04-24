@@ -356,6 +356,8 @@ const handleSubmit = async () => {
 
     formVisible.value = false
     fetchList()
+  } catch {
+    ElMessage.error('保存失败')
   } finally {
     submitLoading.value = false
   }

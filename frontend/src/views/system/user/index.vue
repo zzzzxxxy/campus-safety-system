@@ -405,6 +405,8 @@ async function fetchList() {
     const page = normalizePageData(res.data)
     tableData.value = (page.list || []) as SysUser[]
     total.value = Number(page.total || 0)
+  } catch {
+    ElMessage.error('加载列表失败')
   } finally {
     loading.value = false
   }

@@ -309,6 +309,8 @@ async function fetchList() {
     const data = res.data.data
     tableData.value = data.records || []
     total.value = Number(data.total || 0)
+  } catch {
+    ElMessage.error('加载列表失败')
   } finally {
     loading.value = false
   }
@@ -435,16 +437,22 @@ async function handleSubmit() {
     }
     formVisible.value = false
     fetchList()
+  } catch {
+    ElMessage.error('保存失败')
   } finally {
     submitLoading.value = false
   }
 }
 
 async function handleDelete(row: any) {
-  await ElMessageBox.confirm(`确认删除访客记录(ID=${row.id})？`, '提示', { type: 'warning' })
-  await deleteVisitor(row.id)
-  ElMessage.success('删除成功')
-  fetchList()
+  try {
+    await ElMessageBox.confirm(`确认删除访客记录(ID=${row.id})？`, '提示', { type: 'warning' })
+    await deleteVisitor(row.id)
+    ElMessage.success('删除成功')
+    fetchList()
+  } catch (error: any) {
+    if (error !== 'cancel' && error !== 'close') ElMessage.error('删除失败')
+  }
 }
 
 // 审核
@@ -476,23 +484,33 @@ async function handleAuditSubmit() {
     ElMessage.success('审核成功')
     auditVisible.value = false
     fetchList()
+  } catch {
+    ElMessage.error('审核失败')
   } finally {
     auditLoading.value = false
   }
 }
 
 async function handleCheckIn(row: any) {
-  await ElMessageBox.confirm(`确认对访客(ID=${row.id})执行签到？`, '提示', { type: 'warning' })
-  await checkInVisitor(row.id)
-  ElMessage.success('签到成功')
-  fetchList()
+  try {
+    await ElMessageBox.confirm(`确认对访客(ID=${row.id})执行签到？`, '提示', { type: 'warning' })
+    await checkInVisitor(row.id)
+    ElMessage.success('签到成功')
+    fetchList()
+  } catch (error: any) {
+    if (error !== 'cancel' && error !== 'close') ElMessage.error('签到失败')
+  }
 }
 
 async function handleCheckOut(row: any) {
-  await ElMessageBox.confirm(`确认对访客(ID=${row.id})执行签退？`, '提示', { type: 'warning' })
-  await checkOutVisitor(row.id)
-  ElMessage.success('签退成功')
-  fetchList()
+  try {
+    await ElMessageBox.confirm(`确认对访客(ID=${row.id})执行签退？`, '提示', { type: 'warning' })
+    await checkOutVisitor(row.id)
+    ElMessage.success('签退成功')
+    fetchList()
+  } catch (error: any) {
+    if (error !== 'cancel' && error !== 'close') ElMessage.error('签退失败')
+  }
 }
 
 function parseFilenameFromDisposition(disposition: string): string | null {
@@ -521,20 +539,27 @@ function downloadBlob(blob: Blob, filename: string) {
 }
 
 async function handleExport() {
-  applyRange()
-  const params: any = {
-    visitorName: query.visitorName || undefined,
-    phone: query.phone || undefined,
-    status: query.status,
-    startTime: query.startTime || undefined,
-    endTime: query.endTime || undefined
+  loading.value = true
+  try {
+    applyRange()
+    const params: any = {
+      visitorName: query.visitorName || undefined,
+      phone: query.phone || undefined,
+      status: query.status,
+      startTime: query.startTime || undefined,
+      endTime: query.endTime || undefined
+    }
+    const res: any = await exportVisitor(params)
+    const disposition = res.headers?.['content-disposition'] || res.headers?.['Content-Disposition']
+    const filename = parseFilenameFromDisposition(disposition) || `visitor_records_${Date.now()}.csv`
+    const blob = res.data as Blob
+    downloadBlob(blob, filename)
+    ElMessage.success('导出成功')
+  } catch {
+    ElMessage.error('导出失败')
+  } finally {
+    loading.value = false
   }
-  const res: any = await exportVisitor(params)
-  const disposition = res.headers?.['content-disposition'] || res.headers?.['Content-Disposition']
-  const filename = parseFilenameFromDisposition(disposition) || `visitor_records_${Date.now()}.csv`
-  const blob = res.data as Blob
-  downloadBlob(blob, filename)
-  ElMessage.success('导出成功')
 }
 
 onMounted(() => {

@@ -14,7 +14,7 @@ public class DeviceQueryDTO implements Serializable {
 
     private String deviceCode;
 
-    private Integer deviceType;
+    private String deviceType;
 
     private Integer status;
 

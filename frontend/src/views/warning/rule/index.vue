@@ -300,27 +300,37 @@ async function handleSubmit() {
 
     formVisible.value = false
     fetchList()
+  } catch {
+    ElMessage.error('保存失败')
   } finally {
     submitLoading.value = false
   }
 }
 
 async function handleDelete(row: WarningRuleRow) {
-  await ElMessageBox.confirm(`确认删除规则「${row.ruleName || row.id}」？此操作不可恢复。`, '提示', {
-    confirmButtonText: '确定',
-    cancelButtonText: '取消',
-    type: 'warning'
-  })
-  await deleteWarningRule(row.id)
-  ElMessage.success('删除成功')
-  fetchList()
+  try {
+    await ElMessageBox.confirm(`确认删除规则「${row.ruleName || row.id}」？此操作不可恢复。`, '提示', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning'
+    })
+    await deleteWarningRule(row.id)
+    ElMessage.success('删除成功')
+    fetchList()
+  } catch (error: any) {
+    if (error !== 'cancel' && error !== 'close') ElMessage.error('删除失败')
+  }
 }
 
 async function toggleStatus(row: WarningRuleRow) {
   const enabled = Number(row.enabled) === 0 ? 1 : 0
-  await changeWarningRuleStatus(row.id, enabled)
-  ElMessage.success(enabled === 0 ? '已启用' : '已禁用')
-  fetchList()
+  try {
+    await changeWarningRuleStatus(row.id, enabled)
+    ElMessage.success(enabled === 0 ? '已启用' : '已禁用')
+    fetchList()
+  } catch {
+    ElMessage.error('状态切换失败')
+  }
 }
 
 onMounted(() => {

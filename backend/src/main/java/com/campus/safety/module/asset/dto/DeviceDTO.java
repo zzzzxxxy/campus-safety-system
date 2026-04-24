@@ -20,7 +20,7 @@ public class DeviceDTO implements Serializable {
 
     private String deviceCode;
 
-    private Integer deviceType;
+    private String deviceType;
 
     private String location;
 

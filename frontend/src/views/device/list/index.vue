@@ -214,6 +214,8 @@ async function fetchList() {
     const data = res.data.data
     tableData.value = data.records || []
     total.value = Number(data.total || 0)
+  } catch {
+    ElMessage.error('加载列表失败')
   } finally {
     loading.value = false
   }
@@ -402,19 +404,23 @@ async function handleToggleOnline(row: DeviceInfo) {
 }
 
 async function handleDelete(row: DeviceInfo) {
-  await ElMessageBox.confirm(`确认删除设备【${row.deviceName}】吗？`, '提示', {
-    type: 'warning',
-    confirmButtonText: '确定',
-    cancelButtonText: '取消'
-  })
+  try {
+    await ElMessageBox.confirm(`确认删除设备【${row.deviceName}】吗？`, '提示', {
+      type: 'warning',
+      confirmButtonText: '确定',
+      cancelButtonText: '取消'
+    })
 
-  await deleteDeviceInfo(row.id)
-  ElMessage.success('删除成功')
+    await deleteDeviceInfo(row.id)
+    ElMessage.success('删除成功')
 
-  if (tableData.value.length <= 1 && pageNum.value > 1) {
-    pageNum.value -= 1
+    if (tableData.value.length <= 1 && pageNum.value > 1) {
+      pageNum.value -= 1
+    }
+    fetchList()
+  } catch (error: any) {
+    if (error !== 'cancel' && error !== 'close') ElMessage.error('删除失败')
   }
-  fetchList()
 }
 
 onMounted(() => {

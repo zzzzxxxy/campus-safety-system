@@ -435,7 +435,7 @@
       "module": "integration",
       "category": "integration",
       "description": "前后端联调: CRUD操作联调 (列表/新增/编辑/删除 完整流程)",
-      "passes": false,
+      "passes": true,
       "priority": 2
     },
     {
@@ -459,7 +459,7 @@
       "module": "polish",
       "category": "polish",
       "description": "Loading状态: 数据加载loading, 按钮提交loading",
-      "passes": false,
+      "passes": true,
       "priority": 3
     },
     {
@@ -467,7 +467,7 @@
       "module": "polish",
       "category": "polish",
       "description": "消息提示统一: 操作成功/失败 ElMessage 提示",
-      "passes": false,
+      "passes": true,
       "priority": 2
     },
     {
@@ -481,9 +481,10 @@
   ],
   "statistics": {
     "total": 59,
-    "passing": 43,
-    "failing": 16,
-    "completion_percent": 72.88
+    "passing": 46,
+    "failing": 13,
+    "completion_percentage": 78.0,
+    "completion_percent": 77.97
   },
   "notes": "后端已基本完成, 前端需要从零开始搭建。优先级: 1(必须先做) > 2(核心功能) > 3(增强功能) > 4(锦上添花)"
 }
