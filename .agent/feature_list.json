@@ -4,7 +4,7 @@
     "backend": "Spring Boot 3 + MyBatis-Plus + MySQL + Redis + JWT + Spring Security",
     "frontend": "Vue 3 + Vite + Element Plus + Pinia + Vue Router + ECharts + Axios"
   },
-  "last_updated": "2026-04-16",
+  "last_updated": "2026-04-24",
   "features": [
     {
       "id": "F001",
@@ -363,7 +363,7 @@
       "module": "frontend-warning",
       "category": "frontend",
       "description": "预警级别用颜色区分: 红色(紧急)/橙色(严重)/黄色(一般)/蓝色(提示)",
-      "passes": false,
+      "passes": true,
       "priority": 3
     },
     {
@@ -419,7 +419,7 @@
       "module": "frontend-common",
       "category": "frontend",
       "description": "404页面 + 无权限403页面",
-      "passes": false,
+      "passes": true,
       "priority": 3
     },
     {
@@ -475,7 +475,7 @@
       "module": "polish",
       "category": "polish",
       "description": "数据字典: 用户类型/设备状态/预警级别 等枚举值统一管理",
-      "passes": false,
+      "passes": true,
       "priority": 3
     }
   ],

@@ -129,6 +129,7 @@ import { onMounted, reactive, ref, nextTick } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import type { FormInstance, FormRules } from 'element-plus'
 import { addWarningRule, changeWarningRuleStatus, deleteWarningRule, getWarningRulePage, updateWarningRule } from '@/api/warning'
+import { dictLabel, dictTagType, warningLevelOptions, warningTypeOptions } from '@/utils/dict'
 
 interface WarningRuleRow {
   id: number
@@ -141,38 +142,15 @@ interface WarningRuleRow {
   createTime?: string
 }
 
-const warningTypeOptions = [
-  { label: '安全', value: 1 },
-  { label: '设备', value: 2 },
-  { label: '访客', value: 3 },
-  { label: '其他', value: 4 }
-]
-
-const warningLevelOptions = [
-  { label: '低', value: 1 },
-  { label: '中', value: 2 },
-  { label: '高', value: 3 },
-  { label: '严重', value: 4 }
-]
-
 function warningTypeLabel(v: any) {
-  const n = Number(v)
-  return warningTypeOptions.find((x) => x.value === n)?.label || String(v ?? '')
+  return dictLabel(warningTypeOptions, v)
 }
 
 function warningLevelLabel(v: any) {
-  const n = Number(v)
-  return warningLevelOptions.find((x) => x.value === n)?.label || String(v ?? '')
+  return dictLabel(warningLevelOptions, v)
 }
 
-const levelTagType = (level?: number): 'primary' | 'success' | 'warning' | 'info' | 'danger' | undefined => {
-  const n = Number(level)
-  if (n === 1) return 'info'
-  if (n === 2) return 'warning'
-  if (n === 3) return 'danger'
-  if (n === 4) return 'danger'
-  return undefined
-}
+const levelTagType = (level?: number) => dictTagType(warningLevelOptions, level)
 
 const loading = ref(false)
 const tableData = ref<WarningRuleRow[]>([])

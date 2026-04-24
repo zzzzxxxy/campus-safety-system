@@ -10,9 +10,7 @@
         </el-form-item>
         <el-form-item label="状态">
           <el-select v-model="query.status" placeholder="全部" clearable style="width: 140px">
-            <el-option label="待审批" :value="0" />
-            <el-option label="已通过" :value="1" />
-            <el-option label="已拒绝" :value="2" />
+            <el-option v-for="it in visitorStatusOptions" :key="it.value" :label="it.label" :value="it.value" />
           </el-select>
         </el-form-item>
         <el-form-item label="到访时间">
@@ -230,6 +228,7 @@ import {
   getVisitorPage,
   updateVisitor
 } from '@/api/visitor'
+import { dictLabel, dictTagType, visitorStatusOptions } from '@/utils/dict'
 
 interface VisitorRecord {
   id: number
@@ -278,18 +277,10 @@ function applyRange() {
 }
 
 function statusLabel(v: any) {
-  const n = Number(v)
-  if (n === 0) return '待审批'
-  if (n === 1) return '已通过'
-  if (n === 2) return '已拒绝'
-  return String(v ?? '')
+  return dictLabel(visitorStatusOptions, v)
 }
 function statusTagType(v: any) {
-  const n = Number(v)
-  if (n === 0) return 'warning'
-  if (n === 1) return 'success'
-  if (n === 2) return 'danger'
-  return 'info'
+  return dictTagType(visitorStatusOptions, v) || 'info'
 }
 
 async function fetchList() {

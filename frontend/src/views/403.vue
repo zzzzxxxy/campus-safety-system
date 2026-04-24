@@ -1,9 +1,9 @@
 <template>
-  <div class="error-page not-found">
+  <div class="error-page forbidden">
     <div class="error-card">
-      <div class="code">404</div>
-      <div class="title">页面不存在</div>
-      <div class="desc">你访问的页面不存在、已被删除，或地址输入有误。</div>
+      <div class="code">403</div>
+      <div class="title">无权限访问</div>
+      <div class="desc">当前账号没有访问该页面或资源的权限，请联系管理员开通权限。</div>
       <div class="actions">
         <el-button type="primary" @click="goHome">返回首页</el-button>
         <el-button @click="goBack">返回上一页</el-button>
@@ -26,7 +26,7 @@ const goBack = () => router.back()
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #eef7ff 0%, #f5f7fb 100%);
+  background: linear-gradient(135deg, #f6f9ff 0%, #eef3fb 100%);
 }
 
 .error-card {
@@ -42,7 +42,7 @@ const goBack = () => router.back()
   font-size: 112px;
   line-height: 1;
   font-weight: 800;
-  color: #409eff;
+  color: #e6a23c;
   letter-spacing: 4px;
 }
 

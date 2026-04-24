@@ -10,10 +10,7 @@
         </el-form-item>
         <el-form-item label="资产状态">
           <el-select v-model="query.status" placeholder="全部" clearable style="width: 140px">
-            <el-option label="在用" :value="0" />
-            <el-option label="闲置" :value="1" />
-            <el-option label="报废" :value="2" />
-            <el-option label="维修" :value="3" />
+            <el-option v-for="it in assetStatusOptions" :key="it.value" :label="it.label" :value="it.value" />
           </el-select>
         </el-form-item>
         <el-form-item>
@@ -115,10 +112,7 @@
 
         <el-form-item label="状态" prop="status">
           <el-select v-model="form.status" placeholder="请选择" style="width: 100%">
-            <el-option label="在用" :value="0" />
-            <el-option label="闲置" :value="1" />
-            <el-option label="报废" :value="2" />
-            <el-option label="维修" :value="3" />
+            <el-option v-for="it in assetStatusOptions" :key="it.value" :label="it.label" :value="it.value" />
           </el-select>
         </el-form-item>
 
@@ -165,6 +159,7 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import type { FormInstance, FormRules } from 'element-plus'
 import { addAssetInfo, deleteAssetInfo, getAssetInfoPage, updateAssetInfo } from '@/api/asset'
 import request from '@/utils/request'
+import { assetStatusOptions, dictLabel, dictTagType } from '@/utils/dict'
 
 interface AssetInfoRow {
   id: number
@@ -228,23 +223,9 @@ const fetchList = async () => {
   }
 }
 
-const statusLabel = (status?: number) => {
-  const s = Number(status)
-  if (s === 0) return '在用'
-  if (s === 1) return '闲置'
-  if (s === 2) return '报废'
-  if (s === 3) return '维修'
-  return '未知'
-}
+const statusLabel = (status?: number) => dictLabel(assetStatusOptions, status, '未知')
 
-const statusTagType = (status?: number): 'primary' | 'success' | 'warning' | 'info' | 'danger' | undefined => {
-  const s = Number(status)
-  if (s === 0) return 'success'
-  if (s === 1) return 'info'
-  if (s === 2) return 'danger'
-  if (s === 3) return 'warning'
-  return undefined
-}
+const statusTagType = (status?: number) => dictTagType(assetStatusOptions, status) || 'info'
 
 const formatMoney = (v: any) => {
   if (v === null || v === undefined || v === '') return '-'

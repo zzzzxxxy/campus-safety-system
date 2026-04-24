@@ -136,6 +136,7 @@ import { ElMessage } from 'element-plus'
 import type { FormInstance, FormRules } from 'element-plus'
 import { getWarningRecordPage, handleWarningRecord } from '@/api/warning'
 import request from '@/utils/request'
+import { dictLabel, dictTagType, warningLevelOptions, warningRecordStatusOptions } from '@/utils/dict'
 
 interface WarningRecordRow {
   id: number
@@ -153,52 +154,19 @@ interface WarningRecordRow {
   createTime?: string
 }
 
-const warningLevelOptions = [
-  { label: '低', value: 1 },
-  { label: '中', value: 2 },
-  { label: '高', value: 3 },
-  { label: '严重', value: 4 }
-]
-
-// 处理状态：按需求“待处理/已处理/误报”
-const statusOptions = [
-  { label: '待处理', value: 0 },
-  { label: '已处理', value: 2 },
-  { label: '误报', value: 3 }
-]
+const statusOptions = warningRecordStatusOptions.filter((item) => [0, 2, 3].includes(Number(item.value)))
 
 function levelLabel(v: any) {
-  const n = Number(v)
-  return warningLevelOptions.find((x) => x.value === n)?.label || String(v ?? '')
+  return dictLabel(warningLevelOptions, v)
 }
 
-// 必须根据危险级别上色：严重 danger，中度 warning，高 danger，低 info
-const levelTagType = (level?: any): 'primary' | 'success' | 'warning' | 'info' | 'danger' | undefined => {
-  const n = Number(level)
-  if (n === 1) return 'info'
-  if (n === 2) return 'warning'
-  if (n === 3) return 'danger'
-  if (n === 4) return 'danger'
-  return undefined
-}
+const levelTagType = (level?: any) => dictTagType(warningLevelOptions, level)
 
 function statusLabel(v: any) {
-  const n = Number(v)
-  if (n === 0) return '待处理'
-  if (n === 1) return '处理中'
-  if (n === 2) return '已处理'
-  if (n === 3) return '误报'
-  return String(v ?? '')
+  return dictLabel(warningRecordStatusOptions, v)
 }
 
-const statusTagType = (status?: number): 'primary' | 'success' | 'warning' | 'info' | 'danger' | undefined => {
-  const n = Number(status)
-  if (n === 0) return 'warning'
-  if (n === 1) return 'warning'
-  if (n === 2) return 'success'
-  if (n === 3) return 'info'
-  return undefined
-}
+const statusTagType = (status?: number) => dictTagType(warningRecordStatusOptions, status)
 
 function canHandle(row: WarningRecordRow) {
   return Number(row.status) === 0 || Number(row.status) === 1

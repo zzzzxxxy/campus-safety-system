@@ -97,7 +97,11 @@
           </template>
           <el-table :data="recentWarnings" size="small" style="width: 100%" v-loading="recentLoading">
             <el-table-column prop="title" label="标题" min-width="160" show-overflow-tooltip />
-            <el-table-column prop="warningLevel" label="级别" width="80" />
+            <el-table-column prop="warningLevel" label="级别" width="80">
+              <template #default="scope">
+                <el-tag size="small" :type="levelTagType(scope.row.warningLevel)">{{ levelText(scope.row.warningLevel) }}</el-tag>
+              </template>
+            </el-table-column>
             <el-table-column prop="status" label="状态" width="80">
               <template #default="scope">
                 <el-tag size="small" :type="statusTagType(scope.row.status)">{{ statusText(scope.row.status) }}</el-tag>
@@ -132,6 +136,7 @@ import { Warning, User, Monitor, Document } from '@element-plus/icons-vue'
 
 import { getDashboard, getDeviceStats } from '@/api/report'
 import { getWarningRecordPage } from '@/api/warning'
+import { dictLabel, dictTagType, warningLevelOptions, warningRecordStatusOptions } from '@/utils/dict'
 
 type TrendItem = { date: string; count: number }
 
@@ -230,20 +235,20 @@ const devicePieOption = computed(() => {
 const recentLoading = ref(false)
 const recentWarnings = ref<WarningRecord[]>([])
 
+function levelText(level?: string | number) {
+  return dictLabel(warningLevelOptions, level, '未知')
+}
+
+function levelTagType(level?: string | number) {
+  return dictTagType(warningLevelOptions, level) || 'info'
+}
+
 function statusText(status?: number) {
-  if (status === 0) return '未处理'
-  if (status === 1) return '处理中'
-  if (status === 2) return '已处理'
-  if (status === 3) return '已关闭'
-  return '未知'
+  return dictLabel(warningRecordStatusOptions, status, '未知')
 }
 
 function statusTagType(status?: number) {
-  if (status === 0) return 'danger'
-  if (status === 1) return 'warning'
-  if (status === 2) return 'success'
-  if (status === 3) return 'info'
-  return 'info'
+  return dictTagType(warningRecordStatusOptions, status) || 'info'
 }
 
 async function fetchDashboard() {

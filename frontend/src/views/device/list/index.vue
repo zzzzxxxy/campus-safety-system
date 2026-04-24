@@ -10,10 +10,7 @@
         </el-form-item>
         <el-form-item label="状态">
           <el-select v-model="query.status" placeholder="全部" clearable style="width: 140px">
-            <el-option label="正常" :value="0" />
-            <el-option label="故障" :value="1" />
-            <el-option label="维修" :value="2" />
-            <el-option label="报废" :value="3" />
+            <el-option v-for="it in deviceStatusOptions" :key="it.value" :label="it.label" :value="it.value" />
           </el-select>
         </el-form-item>
         <el-form-item label="在线">
@@ -159,6 +156,7 @@ import { onMounted, reactive, ref, nextTick } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import type { FormInstance, FormRules } from 'element-plus'
 import { addDeviceInfo, deleteDeviceInfo, getDeviceInfoPage, updateDeviceInfo } from '@/api/asset'
+import { deviceStatusOptions, dictLabel, dictTagType } from '@/utils/dict'
 
 interface DeviceInfo {
   id: number
@@ -186,21 +184,11 @@ const query = reactive({
 })
 
 function statusLabel(v: any) {
-  const n = Number(v)
-  if (n === 0) return '正常'
-  if (n === 1) return '故障'
-  if (n === 2) return '维修'
-  if (n === 3) return '报废'
-  return String(v ?? '')
+  return dictLabel(deviceStatusOptions, v)
 }
 
 function statusTagType(v: any) {
-  const n = Number(v)
-  if (n === 0) return 'success'
-  if (n === 1) return 'danger'
-  if (n === 2) return 'warning'
-  if (n === 3) return 'info'
-  return 'info'
+  return dictTagType(deviceStatusOptions, v) || 'info'
 }
 
 async function fetchList() {

@@ -9,6 +9,12 @@ export const constantRoutes: RouteRecordRaw[] = [
     meta: { title: '登录', hidden: true }
   },
   {
+    path: '/403',
+    name: 'Forbidden',
+    component: () => import('@/views/403.vue'),
+    meta: { title: '403', hidden: true }
+  },
+  {
     path: '/404',
     name: 'NotFound',
     component: () => import('@/views/404.vue'),
@@ -45,7 +51,7 @@ const LAYOUT_NAME = 'Layout'
 
 
 // White list - routes that don't require authentication
-const whiteList = ['/login', '/404']
+const whiteList = ['/login', '/403', '/404']
 
 // Flag to track if dynamic routes have been added
 let hasAddedRoutes = false

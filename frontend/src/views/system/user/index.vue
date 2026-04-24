@@ -215,6 +215,7 @@ import { computed, onMounted, reactive, ref, nextTick } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import type { FormInstance, FormRules } from 'element-plus'
 import { getUserPage, addUser, updateUser, deleteUser, resetPassword, getRoleList } from '@/api/system'
+import { dictLabel, userTypeOptions } from '@/utils/dict'
 
 interface SysUser {
   id: number
@@ -247,17 +248,8 @@ interface UserDTO {
   roleIds: number[]
 }
 
-const userTypeOptions = [
-  { label: '管理员', value: 0 },
-  { label: '教师', value: 1 },
-  { label: '学生', value: 2 },
-  { label: '安保', value: 3 }
-]
-
 function userTypeLabel(v: any) {
-  const n = Number(v)
-  const hit = userTypeOptions.find((i) => i.value === n)
-  return hit?.label || String(v ?? '')
+  return dictLabel(userTypeOptions, v)
 }
 
 const loading = ref(false)
