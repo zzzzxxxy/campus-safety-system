@@ -18,6 +18,9 @@ public class DeviceQueryDTO implements Serializable {
 
     private Integer status;
 
+    /** 是否在线(0-离线 1-在线) */
+    private Integer online;
+
     private Integer pageNum = 1;
 
     private Integer pageSize = 10;

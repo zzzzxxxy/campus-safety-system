@@ -39,6 +39,8 @@ public class DeviceInfoServiceImpl implements DeviceInfoService {
                 DeviceInfo::getDeviceType, queryDTO.getDeviceType());
         wrapper.eq(queryDTO.getStatus() != null,
                 DeviceInfo::getStatus, queryDTO.getStatus());
+        wrapper.eq(queryDTO.getOnline() != null,
+                DeviceInfo::getOnline, queryDTO.getOnline());
         wrapper.orderByDesc(DeviceInfo::getCreateTime);
 
         Page<DeviceInfo> page = new Page<>(queryDTO.getPageNum(), queryDTO.getPageSize());

@@ -24,6 +24,12 @@ public class DeviceDTO implements Serializable {
 
     private String location;
 
+    /** IP地址 */
+    private String ipAddress;
+
+    /** 是否在线(0-离线 1-在线) */
+    private Integer online;
+
     private Integer status;
 
     @JsonFormat(pattern = "yyyy-MM-dd")
