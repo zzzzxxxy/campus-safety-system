@@ -365,15 +365,31 @@ public class ReportServiceImpl implements ReportService {
         );
         stats.setRepairCount(repairCount.intValue());
 
-        // 资产总价值
-        List<AssetInfo> assets = assetInfoMapper.selectList(
-                new LambdaQueryWrapper<AssetInfo>().select(AssetInfo::getAssetValue)
-        );
+        // 资产总价值 + 类型/区域分布
+        List<AssetInfo> assets = assetInfoMapper.selectList(new LambdaQueryWrapper<AssetInfo>());
         BigDecimal totalValue = assets.stream()
                 .filter(a -> a.getAssetValue() != null)
                 .map(AssetInfo::getAssetValue)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         stats.setTotalValue(totalValue);
+
+        stats.setTypeDistribution(assets.stream()
+                .collect(Collectors.groupingBy(
+                        a -> a.getAssetType() == null || a.getAssetType().isBlank() ? "未分类" : a.getAssetType(),
+                        Collectors.summingInt(a -> 1)
+                ))
+                .entrySet().stream()
+                .map(e -> new AssetStatsVO.TypeItem(e.getKey(), e.getValue()))
+                .collect(Collectors.toList()));
+
+        stats.setLocationDistribution(assets.stream()
+                .collect(Collectors.groupingBy(
+                        a -> a.getLocation() == null || a.getLocation().isBlank() ? "未填写" : a.getLocation(),
+                        Collectors.summingInt(a -> 1)
+                ))
+                .entrySet().stream()
+                .map(e -> new AssetStatsVO.TypeItem(e.getKey(), e.getValue()))
+                .collect(Collectors.toList()));
 
         return stats;
     }

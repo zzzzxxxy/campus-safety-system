@@ -73,25 +73,42 @@
         </el-card>
       </el-col>
     </el-row>
+
+    <el-row :gutter="16">
+      <el-col :xs="24" :lg="12">
+        <el-card shadow="never" class="chart-card">
+          <template #header>F133 资产类型分布</template>
+          <v-chart class="chart" :option="assetTypeOption" autoresize />
+        </el-card>
+      </el-col>
+      <el-col :xs="24" :lg="12">
+        <el-card shadow="never" class="chart-card">
+          <template #header>F133 资产区域分布</template>
+          <v-chart class="chart" :option="assetLocationOption" autoresize />
+        </el-card>
+      </el-col>
+    </el-row>
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { ElMessage } from 'element-plus'
-import { getDeviceStats, getVisitorStats, getWarningStats } from '@/api/report'
+import { getAssetStats, getDeviceStats, getVisitorStats, getWarningStats } from '@/api/report'
 import { dictLabel, deviceStatusOptions, warningLevelOptions, warningTypeOptions } from '@/utils/dict'
 
 type CountItem = { type?: string | number; level?: string | number; date?: string; month?: string; count: number }
 type DeviceStats = { totalCount?: number; normalCount?: number; faultCount?: number; repairCount?: number; scrapCount?: number; typeDistribution?: CountItem[] }
 type WarningStats = { totalCount?: number; unhandledCount?: number; handlingCount?: number; handledCount?: number; closedCount?: number; levelDistribution?: CountItem[]; typeDistribution?: CountItem[]; monthlyTrend?: CountItem[] }
 type VisitorStats = { totalCount?: number; pendingCount?: number; approvedCount?: number; rejectedCount?: number; dailyStats?: CountItem[] }
+type AssetStats = { totalCount?: number; totalValue?: number; typeDistribution?: CountItem[]; locationDistribution?: CountItem[] }
 
 const loading = ref(false)
 const dateRange = ref(defaultRange())
 const deviceStats = ref<DeviceStats>({})
 const warningStats = ref<WarningStats>({})
 const visitorStats = ref<VisitorStats>({})
+const assetStats = ref<AssetStats>({})
 
 function formatDate(d: Date) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
@@ -110,7 +127,7 @@ const statCards = computed(() => [
   { label: '设备总数', value: deviceStats.value.totalCount ?? 0 },
   { label: '预警总数', value: warningStats.value.totalCount ?? 0 },
   { label: '访客总数', value: visitorStats.value.totalCount ?? 0 },
-  { label: '待审批访客', value: visitorStats.value.pendingCount ?? 0 }
+  { label: '资产总数', value: assetStats.value.totalCount ?? 0 }
 ])
 
 const deviceStatusOption = computed(() => {
@@ -139,6 +156,10 @@ const visitorDailyOption = computed(() => {
   return barOption(list.map((i) => String(i.date || '').slice(5)), list.map((i) => i.count), '#67c23a', '访客量')
 })
 
+const assetTypeOption = computed(() => pieOption('资产类型', (assetStats.value.typeDistribution || []).map((i) => ({ name: String(i.type || '未知'), value: i.count }))))
+
+const assetLocationOption = computed(() => barOption((assetStats.value.locationDistribution || []).map((i) => String(i.type || '未填写')), (assetStats.value.locationDistribution || []).map((i) => i.count), '#e6a23c', '资产数'))
+
 function barOption(xData: string[], yData: number[], color: string, name: string) {
   return { tooltip: { trigger: 'axis' }, grid: { left: 42, right: 20, top: 28, bottom: 36 }, xAxis: { type: 'category', data: xData }, yAxis: { type: 'value', minInterval: 1 }, series: [{ name, type: 'bar', barMaxWidth: 34, data: yData, itemStyle: { color, borderRadius: [6, 6, 0, 0] } }] }
 }
@@ -154,14 +175,16 @@ function pieOption(name: string, data: Array<{ name: string; value: number }>) {
 async function fetchAll() {
   loading.value = true
   try {
-    const [deviceRes, warningRes, visitorRes] = await Promise.all([
+    const [deviceRes, warningRes, visitorRes, assetRes] = await Promise.all([
       getDeviceStats(),
       getWarningStats(params.value),
-      getVisitorStats(params.value)
+      getVisitorStats(params.value),
+      getAssetStats()
     ])
     deviceStats.value = (deviceRes as any)?.data?.data || {}
     warningStats.value = (warningRes as any)?.data?.data || {}
     visitorStats.value = (visitorRes as any)?.data?.data || {}
+    assetStats.value = (assetRes as any)?.data?.data || {}
   } catch (e: any) {
     ElMessage.error(e?.message || '加载报表数据失败')
   } finally {

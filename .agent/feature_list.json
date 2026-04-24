@@ -395,7 +395,7 @@
       "module": "frontend-report",
       "category": "frontend",
       "description": "统计报表: 资产统计(类型分布/区域分布)",
-      "passes": false,
+      "passes": true,
       "priority": 3
     },
     {
@@ -411,7 +411,7 @@
       "module": "frontend-common",
       "category": "frontend",
       "description": "通用搜索表单组件: 支持展开/收起, 重置按钮",
-      "passes": false,
+      "passes": true,
       "priority": 3
     },
     {
@@ -451,7 +451,7 @@
       "module": "polish",
       "category": "polish",
       "description": "响应式适配: 侧边栏在小屏幕自动收起, 表格横向滚动",
-      "passes": false,
+      "passes": true,
       "priority": 4
     },
     {
@@ -481,10 +481,10 @@
   ],
   "statistics": {
     "total": 59,
-    "passing": 56,
-    "failing": 3,
-    "completion_percentage": 94.9,
-    "completion_percent": 94.92
+    "passing": 59,
+    "failing": 0,
+    "completion_percentage": 100.0,
+    "completion_percent": 100.0
   },
   "notes": "后端已基本完成, 前端需要从零开始搭建。优先级: 1(必须先做) > 2(核心功能) > 3(增强功能) > 4(锦上添花)"
 }
