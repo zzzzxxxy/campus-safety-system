@@ -16,6 +16,7 @@
       <el-menu-item
         v-if="onlyOneChild"
         :index="resolvePath(onlyOneChild.path)"
+        :class="{ 'is-single-child': true }"
       >
         <el-icon v-if="onlyOneChild.meta?.icon || item.meta?.icon">
           <component :is="onlyOneChild.meta?.icon || item.meta?.icon" />
@@ -25,7 +26,7 @@
         </template>
       </el-menu-item>
 
-      <el-sub-menu v-else :index="itemFullPath">
+      <el-sub-menu v-else :index="itemFullPath" popper-class="safety-menu-popper">
         <template #title>
           <el-icon v-if="item.meta?.icon">
             <component :is="item.meta.icon" />
@@ -55,13 +56,18 @@ const props = defineProps<{
 
 const itemFullPath = computed(() => props.basePath)
 
+function normalizePath(path: string): string {
+  const clean = path.replace(/\/+/g, '/')
+  return clean.startsWith('/') ? clean : `/${clean}`
+}
+
 function resolvePath(path: string): string {
-  if (!path) return props.basePath
-  if (path.startsWith('/')) return path
+  if (!path) return normalizePath(props.basePath || '/')
+  if (path.startsWith('/')) return normalizePath(path)
+
   const base = props.basePath || ''
-  if (!base) return `/${path}`
-  if (base.endsWith('/')) return base + path
-  return `${base}/${path}`
+  if (!base || base === '/') return normalizePath(path)
+  return normalizePath(`${base.replace(/\/+$/, '')}/${path}`)
 }
 
 const visibleChildren = computed(() => {
@@ -77,3 +83,17 @@ const onlyOneChild = computed<RouteRecordRaw | null>(() => {
   return null
 })
 </script>
+
+
+<style scoped lang="scss">
+:deep(.el-icon) {
+  width: 20px;
+  height: 20px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+:deep(.is-single-child) {
+  position: relative;
+}
+</style>

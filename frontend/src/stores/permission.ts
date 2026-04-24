@@ -86,21 +86,26 @@ function buildRoutes(menus: MenuItem[], parentPath = ''): RouteRecordRaw[] {
     // For nested routes, child path must be RELATIVE, otherwise it becomes root and breaks matched/breadcrumb/opened.
     const isRoot = !parentPath
     const routePath = isRoot ? (rawPath.startsWith('/') ? rawPath : `/${rawPath}`) : rawPath.replace(/^\//, '')
-
     const fullPath = isRoot ? routePath : joinPath(parentPath, routePath)
+    const children = menu.children && menu.children.length ? buildRoutes(menu.children, fullPath) : undefined
 
     const route: RouteRecordRaw = {
       path: routePath,
       name: (menu.name || fullPath).replace(/\//g, '_'),
-      meta: menu.meta || {},
+      meta: { ...(menu.meta || {}), fullPath },
       redirect: menu.redirect,
       component: menu.component
         ? resolveComponent(menu.component)
         : (menu.menuType === 'M' ? ParentView : undefined),
-      children: menu.children && menu.children.length
-        ? buildRoutes(menu.children, fullPath)
-        : undefined
+      children
     } as RouteRecordRaw
+
+    // Directory/menu nodes from backend often have no explicit redirect. Without this,
+    // clicking /device lands on an empty ParentView; redirect to first visible child so
+    // single-child modules such as “设备管理/设备列表” never appear as a blank/404 page.
+    if (!route.redirect && children && children.length > 0) {
+      route.redirect = joinPath(fullPath, String(children[0].path || ''))
+    }
 
     return route
   })

@@ -1,19 +1,30 @@
 // ========== CSS Variables ==========
 :root {
-  --primary-color: #409eff;
-  --success-color: #67c23a;
-  --warning-color: #e6a23c;
-  --danger-color: #f56c6c;
-  --info-color: #909399;
-  --sidebar-width: 210px;
-  --sidebar-collapsed-width: 64px;
-  --header-height: 50px;
-  --tag-view-height: 34px;
-  --bg-color: #f0f2f5;
-  --text-color: #303133;
-  --text-color-secondary: #606266;
-  --border-color: #dcdfe6;
+  --primary-color: #00a37a;
+  --primary-color-light: #e4fff6;
+  --success-color: #16a34a;
+  --warning-color: #f59e0b;
+  --danger-color: #ef4444;
+  --info-color: #64748b;
+  --sidebar-width: 236px;
+  --sidebar-collapsed-width: 72px;
+  --header-height: 58px;
+  --tag-view-height: 38px;
+  --bg-color: #eef3ef;
+  --surface-color: rgba(255, 255, 255, 0.86);
+  --surface-solid: #ffffff;
+  --text-color: #18211d;
+  --text-color-secondary: #65736c;
+  --border-color: rgba(15, 66, 48, 0.12);
   --font-size-base: 14px;
+  --radius-lg: 20px;
+  --radius-md: 14px;
+  --shadow-soft: 0 18px 45px rgba(16, 50, 38, 0.10);
+  --shadow-card: 0 10px 30px rgba(16, 50, 38, 0.08);
+  --gradient-safety: linear-gradient(135deg, #053526 0%, #0b6b4f 46%, #00b987 100%);
+  --gradient-warning: linear-gradient(135deg, #fff7e6 0%, #e6fff5 100%);
+  --font-sans: 'Avenir Next', 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  --font-display: 'DIN Alternate', 'Bahnschrift', 'Avenir Next', 'PingFang SC', sans-serif;
 }
 
 // ========== Reset Styles ==========
@@ -29,11 +40,13 @@ html,
 body {
   width: 100%;
   height: 100%;
-  font-family: 'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB',
-    'Microsoft YaHei', '微软雅黑', Arial, sans-serif;
+  font-family: var(--font-sans);
   font-size: var(--font-size-base);
   color: var(--text-color);
-  background-color: var(--bg-color);
+  background:
+    radial-gradient(circle at 10% 0%, rgba(0, 185, 135, 0.16), transparent 34%),
+    radial-gradient(circle at 100% 10%, rgba(245, 158, 11, 0.12), transparent 30%),
+    linear-gradient(145deg, #edf6f1 0%, #f7faf8 46%, #e8efea 100%);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -41,6 +54,20 @@ body {
 #app {
   width: 100%;
   height: 100%;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.36;
+  background-image:
+    linear-gradient(rgba(5, 53, 38, 0.055) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(5, 53, 38, 0.055) 1px, transparent 1px);
+  background-size: 42px 42px;
+  mask-image: linear-gradient(to bottom, #000 0%, transparent 72%);
 }
 
 a {
@@ -59,9 +86,17 @@ img {
 }
 
 // ========== Element Plus Theme Overrides ==========
+.el-button {
+  border-radius: 12px;
+  font-weight: 600;
+}
+
 .el-button--primary {
   --el-button-bg-color: var(--primary-color);
   --el-button-border-color: var(--primary-color);
+  --el-button-hover-bg-color: #008f6b;
+  --el-button-hover-border-color: #008f6b;
+  box-shadow: 0 8px 18px rgba(0, 163, 122, 0.22);
 }
 
 .el-menu {
@@ -69,21 +104,49 @@ img {
 }
 
 .el-card {
-  border-radius: 4px;
+  border-radius: var(--radius-lg);
   border: 1px solid var(--border-color);
+  background: var(--surface-color);
+  box-shadow: var(--shadow-card) !important;
+  backdrop-filter: blur(18px);
 
   .el-card__header {
-    padding: 14px 20px;
+    padding: 16px 20px;
     border-bottom: 1px solid var(--border-color);
+    font-weight: 700;
   }
 }
 
 .el-table {
+  border-radius: 16px;
+  overflow: hidden;
+  --el-table-border-color: rgba(15, 66, 48, 0.08);
+  --el-table-header-bg-color: #f3f8f5;
+  --el-table-row-hover-bg-color: #f0fbf7;
+
   .el-table__header th {
-    background-color: #f5f7fa;
-    color: var(--text-color);
-    font-weight: 600;
+    background-color: #f3f8f5 !important;
+    color: #173d31;
+    font-weight: 700;
   }
+}
+
+.el-input__wrapper,
+.el-select__wrapper,
+.el-textarea__inner {
+  border-radius: 12px !important;
+  box-shadow: 0 0 0 1px rgba(15, 66, 48, 0.12) inset !important;
+}
+
+.el-input__wrapper.is-focus,
+.el-select__wrapper.is-focused,
+.el-textarea__inner:focus {
+  box-shadow: 0 0 0 1px var(--primary-color) inset, 0 0 0 4px rgba(0, 163, 122, 0.10) !important;
+}
+
+.el-tag {
+  border-radius: 999px;
+  font-weight: 700;
 }
 
 .el-pagination {
@@ -91,9 +154,15 @@ img {
   justify-content: flex-end;
 }
 
+.el-dialog {
+  border-radius: 22px;
+  overflow: hidden;
+}
+
 .el-dialog__header {
   border-bottom: 1px solid var(--border-color);
   margin-right: 0;
+  background: linear-gradient(135deg, #f4fbf8, #ffffff);
 }
 
 .el-dialog__footer {

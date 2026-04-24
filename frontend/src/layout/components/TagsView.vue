@@ -151,12 +151,15 @@ watch(() => contextMenu.visible, (visible) => {
 <style scoped lang="scss">
 .tags-view-container {
   height: 38px;
-  background: #fff;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  background: rgba(255, 255, 255, 0.78);
+  border-left: 1px solid rgba(255, 255, 255, 0.72);
+  border-right: 1px solid rgba(255, 255, 255, 0.72);
+  border-bottom: 1px solid rgba(15, 66, 48, 0.08);
   display: flex;
   align-items: center;
   position: relative;
   z-index: 5;
+  backdrop-filter: blur(18px);
 }
 
 .tags-scrollbar {
@@ -166,8 +169,8 @@ watch(() => contextMenu.visible, (visible) => {
 .tags-wrapper {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 0 12px;
+  gap: 8px;
+  padding: 0 14px;
   white-space: nowrap;
 }
 
@@ -176,24 +179,27 @@ watch(() => contextMenu.visible, (visible) => {
   align-items: center;
   gap: 6px;
   height: 26px;
-  padding: 0 10px;
-  border: 1px solid #dcdfe6;
-  border-radius: 4px;
-  color: #606266;
+  padding: 0 11px;
+  border: 1px solid rgba(15, 66, 48, 0.10);
+  border-radius: 999px;
+  color: #65736c;
   font-size: 12px;
+  font-weight: 650;
   cursor: pointer;
-  background: #fff;
+  background: rgba(255, 255, 255, 0.76);
   transition: all 0.2s ease;
 
   &:hover {
-    color: #409eff;
-    border-color: rgba(64, 158, 255, 0.45);
+    color: var(--primary-color);
+    border-color: rgba(0, 163, 122, 0.28);
+    transform: translateY(-1px);
   }
 
   &.active {
-    color: #fff;
-    border-color: #409eff;
-    background: linear-gradient(135deg, #409eff, #67c23a);
+    color: #ffffff;
+    border-color: transparent;
+    background: var(--gradient-safety);
+    box-shadow: 0 8px 18px rgba(0, 163, 122, 0.18);
   }
 }
 
@@ -201,7 +207,7 @@ watch(() => contextMenu.visible, (visible) => {
   border-radius: 50%;
 
   &:hover {
-    background: rgba(0, 0, 0, 0.12);
+    background: rgba(255, 255, 255, 0.22);
   }
 }
 
@@ -209,23 +215,25 @@ watch(() => contextMenu.visible, (visible) => {
   position: fixed;
   z-index: 3000;
   margin: 0;
-  padding: 6px 0;
+  padding: 8px;
   list-style: none;
-  background: #fff;
-  border: 1px solid #ebeef5;
-  border-radius: 4px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid rgba(15, 66, 48, 0.10);
+  border-radius: 14px;
+  box-shadow: var(--shadow-card);
+  backdrop-filter: blur(18px);
 
   li {
-    min-width: 96px;
+    min-width: 102px;
     padding: 8px 14px;
-    color: #606266;
+    color: #51635b;
     font-size: 13px;
+    border-radius: 10px;
     cursor: pointer;
 
     &:hover {
-      color: #409eff;
-      background: #ecf5ff;
+      color: #0f513d;
+      background: #e7fff6;
     }
   }
 }

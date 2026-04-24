@@ -1,8 +1,16 @@
 <template>
   <div class="dashboard-container" v-loading="loading">
     <div class="welcome-section">
-      <h2 class="welcome-title">欢迎使用校园安全管理系统</h2>
-      <p class="welcome-desc">Campus Safety Management System</p>
+      <div>
+        <p class="welcome-kicker">CAMPUS SAFETY COMMAND CENTER</p>
+        <h2 class="welcome-title">校园安全态势总览</h2>
+        <p class="welcome-desc">融合预警、访客、设备与资产数据，辅助安保人员快速发现风险并闭环处置。</p>
+      </div>
+      <div class="hero-radar">
+        <span class="radar-ring ring-1"></span>
+        <span class="radar-ring ring-2"></span>
+        <span class="radar-dot"></span>
+      </div>
     </div>
 
     <el-row :gutter="16" class="stat-cards">
@@ -359,33 +367,126 @@ onMounted(() => {
 
 <style scoped lang="scss">
 .dashboard-container {
-  padding: 20px;
+  padding: 22px;
 }
 
 .welcome-section {
-  margin-bottom: 24px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  min-height: 154px;
+  margin-bottom: 22px;
+  padding: 28px 32px;
+  border-radius: 28px;
+  color: #ffffff;
+  background:
+    radial-gradient(circle at 82% 36%, rgba(255, 255, 255, 0.22), transparent 28%),
+    linear-gradient(135deg, #043525 0%, #0a674d 54%, #00a37a 100%);
+  box-shadow: 0 24px 55px rgba(5, 53, 38, 0.24);
+}
+
+.welcome-section::before,
+.welcome-section::after {
+  content: '';
+  position: absolute;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.09);
+}
+
+.welcome-section::before {
+  width: 260px;
+  height: 260px;
+  right: -70px;
+  top: -90px;
+}
+
+.welcome-section::after {
+  width: 140px;
+  height: 140px;
+  left: 46%;
+  bottom: -80px;
+}
+
+.welcome-kicker {
+  position: relative;
+  z-index: 1;
+  margin: 0 0 10px;
+  color: rgba(255, 255, 255, 0.70);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 2px;
 }
 
 .welcome-title {
-  font-size: 22px;
-  font-weight: 600;
-  color: #303133;
-  margin: 0 0 6px 0;
+  position: relative;
+  z-index: 1;
+  font-size: 30px;
+  font-weight: 900;
+  margin: 0 0 10px 0;
+  letter-spacing: 1px;
 }
 
 .welcome-desc {
-  font-size: 13px;
-  color: #909399;
+  position: relative;
+  z-index: 1;
+  max-width: 620px;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.78);
   margin: 0;
+  line-height: 1.8;
+}
+
+.hero-radar {
+  position: relative;
+  z-index: 1;
+  width: 116px;
+  height: 116px;
+  flex: 0 0 116px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.18), transparent 64%);
+}
+
+.radar-ring,
+.radar-dot {
+  position: absolute;
+  border-radius: 50%;
+}
+
+.radar-ring {
+  inset: 16px;
+  border: 1px solid rgba(190, 242, 100, 0.38);
+}
+
+.ring-2 {
+  inset: 34px;
+}
+
+.radar-dot {
+  width: 13px;
+  height: 13px;
+  left: 52px;
+  top: 28px;
+  background: #fbbf24;
+  box-shadow: 0 0 22px rgba(251, 191, 36, 0.86);
 }
 
 .stat-cards {
   .el-col {
-    margin-bottom: 12px;
+    margin-bottom: 14px;
   }
 }
 
 .stat-card {
+  overflow: hidden;
+
+  :deep(.el-card__body) {
+    padding: 20px;
+  }
+
   .stat-card-inner {
     display: flex;
     align-items: center;
@@ -393,13 +494,14 @@ onMounted(() => {
   }
 
   .stat-icon {
-    width: 56px;
-    height: 56px;
-    border-radius: 8px;
+    width: 58px;
+    height: 58px;
+    border-radius: 18px;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.72);
   }
 
   .stat-info {
@@ -407,23 +509,25 @@ onMounted(() => {
   }
 
   .stat-value {
-    font-size: 28px;
-    font-weight: 700;
-    color: #303133;
-    line-height: 1.2;
+    font-family: var(--font-display);
+    font-size: 32px;
+    font-weight: 900;
+    color: #123529;
+    line-height: 1.1;
   }
 
   .stat-label {
     font-size: 13px;
-    color: #909399;
-    margin-top: 4px;
+    color: var(--text-color-secondary);
+    margin-top: 6px;
+    font-weight: 700;
   }
 }
 
 .card-title {
   font-size: 15px;
-  font-weight: 600;
-  color: #303133;
+  font-weight: 800;
+  color: #173d31;
 }
 
 .card-header {
@@ -439,8 +543,31 @@ onMounted(() => {
 }
 
 .quick-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+
+  .el-button {
+    height: 48px;
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-container {
+    padding: 12px;
+  }
+
+  .welcome-section {
+    padding: 22px;
+  }
+
+  .hero-radar {
+    display: none;
+  }
+
+  .quick-actions {
+    grid-template-columns: 1fr;
+  }
 }
 </style>
