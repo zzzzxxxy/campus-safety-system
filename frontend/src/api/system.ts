@@ -63,3 +63,13 @@ export function deleteMenu(id: number) {
 export function getMenuIdsByRoleId(roleId: number) {
   return request.get(`/system/menu/role/${roleId}`)
 }
+
+
+// ========== Operation Log ==========
+export function getOperLogPage(params: any) {
+  return request.get('/system/log/page', { params })
+}
+
+export function clearOperLog() {
+  return request.delete('/system/log/clear')
+}

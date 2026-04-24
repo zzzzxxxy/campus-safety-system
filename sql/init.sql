@@ -279,7 +279,8 @@ INSERT INTO sys_menu (id, menu_name, parent_id, order_num, path, component, menu
 
 -- 数据报表 -> 二级菜单
 INSERT INTO sys_menu (id, menu_name, parent_id, order_num, path, component, menu_type, perms, icon, visible, status, create_by) VALUES
-(601, '数据看板', 6, 1, 'dashboard', 'report/dashboard/index', 'C', 'report:dashboard:view', 'chart', 0, 0, 'system');
+(601, '数据看板', 6, 1, 'dashboard', 'report/dashboard/index', 'C', 'report:dashboard:view', 'chart', 0, 0, 'system'),
+(602, '统计报表', 6, 2, 'statistics', 'report/dashboard/index', 'C', 'report:statistics:view', 'DataAnalysis', 0, 0, 'system');
 
 -- 按钮权限 (menu_type = F)
 -- 用户管理按钮
@@ -299,6 +300,14 @@ INSERT INTO sys_menu (id, menu_name, parent_id, order_num, path, component, menu
 (1031, '菜单新增', 103, 1, '', NULL, 'F', 'system:menu:add',    NULL, 0, 0, 'system'),
 (1032, '菜单修改', 103, 2, '', NULL, 'F', 'system:menu:edit',   NULL, 0, 0, 'system'),
 (1033, '菜单删除', 103, 3, '', NULL, 'F', 'system:menu:delete', NULL, 0, 0, 'system');
+
+-- 日志管理按钮
+INSERT INTO sys_menu (id, menu_name, parent_id, order_num, path, component, menu_type, perms, icon, visible, status, create_by) VALUES
+(1041, '日志清空', 104, 1, '', NULL, 'F', 'system:log:delete', NULL, 0, 0, 'system');
+
+-- 报表管理按钮
+INSERT INTO sys_menu (id, menu_name, parent_id, order_num, path, component, menu_type, perms, icon, visible, status, create_by) VALUES
+(6021, '统计报表查看', 602, 1, '', NULL, 'F', 'report:statistics:view', NULL, 0, 0, 'system');
 
 -- 访客管理按钮
 INSERT INTO sys_menu (id, menu_name, parent_id, order_num, path, component, menu_type, perms, icon, visible, status, create_by) VALUES
@@ -361,6 +370,7 @@ INSERT INTO sys_role_menu (role_id, menu_id) VALUES
 (1, 501),
 (1, 502),
 (1, 601),
+(1, 602),
 (1, 1011),
 (1, 1012),
 (1, 1013),
@@ -370,6 +380,7 @@ INSERT INTO sys_role_menu (role_id, menu_id) VALUES
 (1, 1031),
 (1, 1032),
 (1, 1033),
+(1, 1041),
 (1, 2011),
 (1, 2012),
 (1, 2013),
@@ -386,7 +397,8 @@ INSERT INTO sys_role_menu (role_id, menu_id) VALUES
 (1, 5014),
 (1, 5021),
 (1, 5022),
-(1, 5023);
+(1, 5023),
+(1, 6021);
 
 -- user角色关联除系统管理外的菜单
 INSERT INTO sys_role_menu (role_id, menu_id) VALUES
@@ -401,6 +413,7 @@ INSERT INTO sys_role_menu (role_id, menu_id) VALUES
 (2, 501),
 (2, 502),
 (2, 601),
+(2, 602),
 (2, 2011),
 (2, 2012),
 (2, 2013),
@@ -417,7 +430,8 @@ INSERT INTO sys_role_menu (role_id, menu_id) VALUES
 (2, 5014),
 (2, 5021),
 (2, 5022),
-(2, 5023);
+(2, 5023),
+(2, 6021);
 
 -- -----------------------------------------------------------
 -- 测试数据：访客记录
