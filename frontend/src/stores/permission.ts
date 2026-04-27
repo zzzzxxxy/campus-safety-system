@@ -91,7 +91,11 @@ function buildRoutes(menus: MenuItem[], parentPath = ''): RouteRecordRaw[] {
 
     const route: RouteRecordRaw = {
       path: routePath,
-      name: (menu.name || fullPath).replace(/\//g, '_'),
+      // Use fullPath as route name source to avoid duplicate child names such as
+      // visitor/record and warning/record, or device/list and asset/list.
+      // Vue Router requires unique route names; duplicate names silently replace
+      // earlier routes and cause existing menu pages to resolve to /404.
+      name: fullPath.replace(/\//g, '_'),
       meta: { ...(menu.meta || {}), fullPath },
       redirect: menu.redirect,
       component: menu.component

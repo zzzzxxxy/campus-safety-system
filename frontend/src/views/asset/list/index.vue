@@ -216,8 +216,9 @@ const fetchList = async () => {
       status: query.status
     }
     const res: any = await getAssetInfoPage(params)
-    tableData.value = res?.data?.records || []
-    total.value = Number(res?.data?.total || 0)
+    const data = res?.data?.data || res?.data || {}
+    tableData.value = data.records || []
+    total.value = Number(data.total || 0)
   } finally {
     loading.value = false
   }
